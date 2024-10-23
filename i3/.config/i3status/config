@@ -1,0 +1,22 @@
+general {
+	output_format = "i3bar"
+	colors = true
+}
+
+order += "volume master"
+order += "memory"
+order += "tztime local"
+
+memory {
+	format = "RAM %used"
+}
+
+tztime local {
+	format = "%Y-%m-%d %H:%M"
+}
+
+volume master {
+	format = "%volume"
+	device = "pulse"
+	mixer = "Master"
+}
