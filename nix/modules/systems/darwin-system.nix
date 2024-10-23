@@ -7,7 +7,6 @@
     loginwindow.GuestEnabled = false;
     NSGlobalDomain = {
       "com.apple.mouse.tapBehavior" = 1;
-      _HIHideMenuBar = true;
       AppleInterfaceStyle = "Dark";
       KeyRepeat = 2;
     };
