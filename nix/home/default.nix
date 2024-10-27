@@ -31,7 +31,7 @@ in
 	      eza
 	
 	      # Languages and development tools
-	      nodejs_20
+        bun
 	      go
 
         # LSP
