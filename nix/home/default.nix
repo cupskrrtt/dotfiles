@@ -33,6 +33,7 @@ in
 	      # Languages and development tools
         bun
 	      go
+        nodejs_20
 
         # LSP
         vscode-langservers-extracted
