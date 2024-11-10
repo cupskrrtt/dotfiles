@@ -21,4 +21,3 @@ keymap.set("n", "<leader>di", ":lua vim.lsp.buf.implementation()<CR>")
 keymap.set("n", "<leader>dt", ":lua vim.lsp.buf.type_definition()<CR>")
 keymap.set("n", "<leader>dr", ":lua vim.lsp.buf.references()<CR>")
 keymap.set("n", "<leader>ca", ":lua vim.lsp.buf.code_action()<CR>")
-

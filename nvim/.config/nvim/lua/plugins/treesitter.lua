@@ -6,8 +6,12 @@ return {
 
     config.setup({
       ensure_installed = {
+        "javascript",
+        "jsdoc",
+        "diff",
         "typescript",
         "html",
+        "tsx",
         "go",
         "css",
       },

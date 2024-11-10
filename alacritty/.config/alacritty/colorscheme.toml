@@ -1,5 +1,8 @@
 # TokyoNight Alacritty Colors
 # Default colors
+[colors]
+draw_bold_text_with_bright_colors = true
+
 [colors.primary]
 background = '#1a1b26'
 foreground = '#c0caf5'
