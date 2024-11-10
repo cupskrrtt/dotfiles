@@ -1,6 +1,6 @@
 vim.cmd("autocmd!")
 
-vim.o.termguicolor = true
+vim.o.termguicolors = true
 
 vim.scriptencoding = "utf-8"
 vim.opt.encoding = "utf-8"
