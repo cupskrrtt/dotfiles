@@ -73,11 +73,13 @@ return {
     config = function()
       require("conform").setup({
         formatters_by_ft = {
-          typescript = { "biome" },
-          typescriptreact = { "biome" },
-          json = { "biome" },
-          html = { "biome" },
-          css = { "biome" },
+          javascript = { { "biome", "prettier" } },
+          javascriptreact = { { "biome", "prettier" } },
+          typescript = { { "biome", "prettier" } },
+          typescriptreact = { { "biome", "prettier" } },
+          json = { { "biome", "prettier" } },
+          html = { { "biome", "prettier" } },
+          css = { { "biome", "prettier" } },
         },
         format_on_save = {
           timeout_ms = 500,
