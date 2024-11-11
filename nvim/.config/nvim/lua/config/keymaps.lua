@@ -1,6 +1,10 @@
 local keymap = vim.keymap
+local builtin = require("telescope.builtin")
 
 keymap.set("n", "<leader>fb", "<cmd>Explore<CR>")
+keymap.set("n", "<leader>ff", "<cmd>Telescope find_files<CR>")
+keymap.set("n", "<leader>fg", "<cmd>Telescope live_grep<CR>")
+
 keymap.set("n", "<C-a>", "gg<S-v>G")
 keymap.set("n", "+", "<C-a>")
 keymap.set("n", "-", "<C-x>")
