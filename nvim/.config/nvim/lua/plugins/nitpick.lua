@@ -6,7 +6,6 @@ return {
         typescriptreact = { "eslint_d", "eslint", "biome" },
         javascript = { "eslint_", "eslint" },
       },
-      auto_lint = false
     })
   end,
 }
