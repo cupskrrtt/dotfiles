@@ -1,5 +1,4 @@
 local keymap = vim.keymap
-local builtin = require("telescope.builtin")
 
 keymap.set("n", "<leader>fb", "<cmd>Explore<CR>")
 keymap.set("n", "<leader>ff", "<cmd>Telescope find_files<CR>")

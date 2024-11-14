@@ -57,8 +57,19 @@ return {
           "typescriptreact"
         }
       })
-      lspconfig.tailwindcss.setup {}
-      lspconfig.cssls.setup {}
+      lspconfig.tailwindcss.setup({
+        settings = {
+          tailwindCSS = {
+            experimental = {
+              classRegex = {
+                { "cva\\(([^)]*)\\)", "[\"'`]([^\"'`]*).*?[\"'`]" },
+                { "cx\\(([^)]*)\\)",  "(?:'|\"|`)([^']*)(?:'|\"|`)" }
+              }
+            }
+          }
+        }
+      })
+      lspconfig.cssls.setup({})
 
       ---
       -- Autocomplete setup
@@ -89,27 +100,18 @@ return {
     config = function()
       require("conform").setup({
         formatters_by_ft = {
-          javascript = { { "biome", "prettier" } },
-          javascriptreact = { { "biome", "prettier" } },
-          typescript = { { "biome", "prettier" } },
-          typescriptreact = { { "biome", "prettier" } },
-          json = { { "biome", "prettier" } },
-          html = { { "biome", "prettier" } },
-          css = { { "biome", "prettier" } },
+          javascript = { "biome", "prettier", stop_after_first = true },
+          javascriptreact = { "biome", "prettier", stop_after_first = true },
+          typescript = { "biome", "prettier", stop_after_first = true },
+          typescriptreact = { "biome", "prettier", stop_after_first = true },
+          json = { "biome", "prettier", stop_after_first = true },
+          html = { "biome", "prettier", stop_after_first = true },
+          css = { "biome", "prettier", stop_after_first = true },
         },
-        format_on_save = {
-          timeout_ms = 500,
-          lsp_format = "fallback"
+        format_after_save = {
+          lsp_format = "fallback",
         }
       })
     end
   },
-
-  --Misc
-  {
-    "dmmulroy/ts-error-translator.nvim",
-    config = function()
-      require("ts-error-translator").setup({})
-    end
-  }
 }
