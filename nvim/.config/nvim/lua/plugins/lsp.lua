@@ -31,7 +31,22 @@ return {
       --   end
       -- })
 
-      lspconfig.lua_ls.setup({})
+      lspconfig.lua_ls.setup({
+        settings = {
+          Lua = {
+            runtime = {
+              version = "LuaJIT", -- Lua version
+            },
+            diagnostics = {
+              globals = { "vim" }, -- Let Lua LSP know 'vim' is a global
+            },
+            workspace = {
+              checkThirdParty = false,
+              library = vim.api.nvim_get_runtime_file("", true), -- Include Neovim runtime files
+            },
+          },
+        },
+      })
       lspconfig.gopls.setup({})
       lspconfig.ts_ls.setup({})
       lspconfig.html.setup({
@@ -70,6 +85,7 @@ return {
   --Formatter
   {
     "stevearc/conform.nvim",
+    event = { "BufReadPre", "BufNewFile" },
     config = function()
       require("conform").setup({
         formatters_by_ft = {
@@ -88,6 +104,7 @@ return {
       })
     end
   },
+
   --Misc
   {
     "dmmulroy/ts-error-translator.nvim",
