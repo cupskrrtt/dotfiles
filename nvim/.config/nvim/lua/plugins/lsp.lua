@@ -4,7 +4,6 @@ return {
     "neovim/nvim-lspconfig",
     dependencies = {
       { "hrsh7th/cmp-nvim-lsp" },
-      { "hrsh7th/nvim-cmp" },
     },
     config = function()
       ---
@@ -35,14 +34,19 @@ return {
         settings = {
           Lua = {
             runtime = {
-              version = "LuaJIT", -- Lua version
+              version = "Lua 5.1", -- Lua version
+              path = vim.split(package.path, ';'),
             },
             diagnostics = {
-              globals = { "vim" }, -- Let Lua LSP know 'vim' is a global
+              globals = { "vim", "love", "jit" },
             },
             workspace = {
-              checkThirdParty = false,
-              library = vim.api.nvim_get_runtime_file("", true), -- Include Neovim runtime files
+              checkThirdParty = true,
+              library = {
+                [vim.fn.expand('$VIMRUNTIME/lua')] = true,
+                [vim.fn.expand('$VIMRUNTIME/lua/vim/lsp')] = true,
+                [vim.fn.expand('${3rd}/love2d/library')] = true
+              }
             },
           },
         },
@@ -69,20 +73,41 @@ return {
           }
         }
       })
+      lspconfig.prismals.setup({})
       lspconfig.cssls.setup({})
+      lspconfig.sqlls.setup({
+        cmd = { "sql-language-server", "up", "--method", "stdio" },
+      })
+    end
+  },
 
-      ---
-      -- Autocomplete setup
-      ---
+  --Completion
+  {
+    "hrsh7th/nvim-cmp",
+    dependencies = {
+      "hrsh7th/cmp-nvim-lsp",
+      "L3MON4D3/LuaSnip",
+      "saadparwaiz1/cmp_luasnip",
+    },
+    config = function()
+      vim.opt.completeopt = { "menu", "menuone", "noselect" }
+
+      require("luasnip.loaders.from_vscode").lazy_load()
+
       local cmp = require("cmp")
+      local luasnip = require("luasnip")
 
       cmp.setup({
-        sources = {
-          { name = "nvim_lsp" }
+        sources = cmp.config.sources {
+          { name = "nvim_lsp", keyword_length = 1 },
+          { name = "luasnip",  keyword_length = 2 }
+        },
+        window = {
+          documentation = cmp.config.window.bordered()
         },
         snippet = {
           expand = function(args)
-            vim.snippet.expand(args.body)
+            luasnip.lsp_expand(args.body)
           end,
         },
         mapping = cmp.mapping.preset.insert({
@@ -93,6 +118,7 @@ return {
       })
     end
   },
+
   --Formatter
   {
     "stevearc/conform.nvim",
