@@ -29,6 +29,7 @@ in
 	      tree
 	      btop
 	      eza
+        gitleaks
 	
 	      # Languages and development tools
         bun
