@@ -4,7 +4,6 @@ return {
     "neovim/nvim-lspconfig",
     dependencies = {
       { "hrsh7th/cmp-nvim-lsp" },
-      { "hrsh7th/nvim-cmp" },
     },
     config = function()
       ---
@@ -31,7 +30,27 @@ return {
       --   end
       -- })
 
-      lspconfig.lua_ls.setup({})
+      lspconfig.lua_ls.setup({
+        settings = {
+          Lua = {
+            runtime = {
+              version = "Lua 5.1", -- Lua version
+              path = vim.split(package.path, ';'),
+            },
+            diagnostics = {
+              globals = { "vim", "love", "jit" },
+            },
+            workspace = {
+              checkThirdParty = true,
+              library = {
+                [vim.fn.expand('$VIMRUNTIME/lua')] = true,
+                [vim.fn.expand('$VIMRUNTIME/lua/vim/lsp')] = true,
+                [vim.fn.expand('${3rd}/love2d/library')] = true
+              }
+            },
+          },
+        },
+      })
       lspconfig.gopls.setup({})
       lspconfig.ts_ls.setup({})
       lspconfig.html.setup({
@@ -42,21 +61,53 @@ return {
           "typescriptreact"
         }
       })
-      lspconfig.tailwindcss.setup {}
-      lspconfig.cssls.setup {}
+      lspconfig.tailwindcss.setup({
+        settings = {
+          tailwindCSS = {
+            experimental = {
+              classRegex = {
+                { "cva\\(([^)]*)\\)", "[\"'`]([^\"'`]*).*?[\"'`]" },
+                { "cx\\(([^)]*)\\)",  "(?:'|\"|`)([^']*)(?:'|\"|`)" }
+              }
+            }
+          }
+        }
+      })
+      lspconfig.prismals.setup({})
+      lspconfig.cssls.setup({})
+      lspconfig.sqlls.setup({
+        cmd = { "sql-language-server", "up", "--method", "stdio" },
+      })
+    end
+  },
 
-      ---
-      -- Autocomplete setup
-      ---
+  --Completion
+  {
+    "hrsh7th/nvim-cmp",
+    dependencies = {
+      "hrsh7th/cmp-nvim-lsp",
+      "L3MON4D3/LuaSnip",
+      "saadparwaiz1/cmp_luasnip",
+    },
+    config = function()
+      vim.opt.completeopt = { "menu", "menuone", "noselect" }
+
+      require("luasnip.loaders.from_vscode").lazy_load()
+
       local cmp = require("cmp")
+      local luasnip = require("luasnip")
 
       cmp.setup({
-        sources = {
-          { name = "nvim_lsp" }
+        sources = cmp.config.sources {
+          { name = "nvim_lsp", keyword_length = 1 },
+          { name = "luasnip",  keyword_length = 2 }
+        },
+        window = {
+          documentation = cmp.config.window.bordered()
         },
         snippet = {
           expand = function(args)
-            vim.snippet.expand(args.body)
+            luasnip.lsp_expand(args.body)
           end,
         },
         mapping = cmp.mapping.preset.insert({
@@ -67,30 +118,26 @@ return {
       })
     end
   },
+
   --Formatter
   {
     "stevearc/conform.nvim",
+    event = { "BufReadPre", "BufNewFile" },
     config = function()
       require("conform").setup({
         formatters_by_ft = {
-          typescript = { "biome" },
-          typescriptreact = { "biome" },
-          json = { "biome" },
-          html = { "biome" },
-          css = { "biome" },
+          javascript = { "biome", "prettier", stop_after_first = true },
+          javascriptreact = { "biome", "prettier", stop_after_first = true },
+          typescript = { "biome", "prettier", stop_after_first = true },
+          typescriptreact = { "biome", "prettier", stop_after_first = true },
+          json = { "biome", "prettier", stop_after_first = true },
+          html = { "biome", "prettier", stop_after_first = true },
+          css = { "biome", "prettier", stop_after_first = true },
         },
-        format_on_save = {
-          timeout_ms = 500,
-          lsp_format = "fallback"
+        format_after_save = {
+          lsp_format = "fallback",
         }
       })
     end
   },
-  --Misc
-  {
-    "dmmulroy/ts-error-translator.nvim",
-    config = function()
-      require("ts-error-translator").setup({})
-    end
-  }
 }

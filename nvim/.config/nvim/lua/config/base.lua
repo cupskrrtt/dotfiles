@@ -1,4 +1,4 @@
-vim.cmd("autocmd!")
+vim.o.termguicolors = true
 
 vim.scriptencoding = "utf-8"
 vim.opt.encoding = "utf-8"
@@ -33,4 +33,4 @@ vim.opt.backspace = "start,eol,indent"
 vim.opt.path:append({ "**" }) --finding files - search down into subfolder
 vim.opt.wildignore:append({ "*/node_modules/*" })
 
-vim.opt.clipboard:append({"unnamedplus"})
+vim.opt.clipboard:append({ "unnamedplus" })
