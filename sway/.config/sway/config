@@ -16,9 +16,9 @@ set $right l
 # Your preferred terminal emulator
 set $term alacritty
 # Your preferred application launcher
-set $menu bemenu-run
-# Load Colorscheme
-include catppuccin-mocha
+set $menu fuzzel
+
+include colorscheme
 
 ### Output configuration
 #
@@ -27,7 +27,7 @@ output * bg ~/Downloads/vibrant-gate.png fill
 #
 # Example configuration:
 #
-#   output HDMI-A-1 resolution 1920x1080 position 1920,0
+output HDMI-A-2 resolution 1920x1080@75Hz position 1920,0
 #
 # You can get the names of your outputs by running: swaymsg -t get_outputs
 
@@ -224,12 +224,9 @@ bindsym $mod+r mode "resize"
 # Colorscheme
 #
 # target                 title     bg    text   indicator  border
-client.focused           $lavender $base $text  $rosewater $lavender
-client.focused_inactive  $overlay0 $base $text  $rosewater $overlay0
-client.unfocused         $overlay0 $base $text  $rosewater $overlay0
-client.urgent            $peach    $base $peach $overlay0  $peach
-client.placeholder       $overlay0 $base $text  $overlay0  $overlay0
-client.background        $base
+client.focused           #9aa5ce #16161d #c0caf5 $blue $blue
+client.focused_inactive  #16161d #16161d #c0caf5 $blue $blue
+client.unfocused         #16161d #16161d #c0caf5 $bg_highlight $bg_highlight
  
 
 #
@@ -240,27 +237,5 @@ client.background        $base
 bar {
   swaybar_command waybar
 }
-#bar {
-#    position top
-#
-#    font "JetbrainsMono Nerd Font"
-#
-#    # When the status_command prints a new line to stdout, swaybar updates.
-#    # The default just shows the current date and time.
-#    status_command while date +'%Y-%m-%d %X'; do sleep 1; done
-#
-#    colors {
-#      background         $base
-#      statusline         $text
-#      focused_statusline $text
-#      focused_separator  $base
-#
-#      # target           border bg        text
-#      focused_workspace  $base  $mauve    $crust
-#      active_workspace   $base  $surface2 $text
-#      inactive_workspace $base  $base     $text
-#      urgent_workspace   $base  $red      $crust
-#    }
-#}
 
 include /etc/sway/config.d/*
