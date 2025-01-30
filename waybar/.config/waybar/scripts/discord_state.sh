@@ -1,6 +1,6 @@
 #!/bin/bash
 
 if pgrep "Discord" > /dev/null; then
-  echo '{"text": " "}'
+  echo '{"text": "DISCORD"}'
 fi
 

@@ -23,7 +23,7 @@ include catppuccin-mocha
 ### Output configuration
 #
 # Default wallpaper (more resolutions are available in /usr/share/backgrounds/sway/)
-output * bg ~/Downloads/wallpaper.jpg fill
+output * bg ~/Downloads/vibrant-gate.png fill
 #
 # Example configuration:
 #

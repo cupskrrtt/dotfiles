@@ -10,15 +10,12 @@
         "sway/workspaces",
         "sway/mode"
     ],
-    "modules-center": [
-        "sway/window"
-    ],
     "modules-right": [
         "pulseaudio",
-        "memory",
+        "custom/memory",
         "clock",
         "custom/discord",
-        "custom/steam"
+        "custom/steam",
     ],
     // Modules configuration
     // "sway/workspaces": {
@@ -188,6 +185,12 @@
         "return-type": "json",
         "interval": 5
     },
+    "custom/memory": {
+        "exec": "$HOME/dotfiles/waybar/.config/waybar/scripts/memory_usage.sh",
+        "interval": 2,
+        "return-type": "json",
+        "format": "RAM {}"
+    },
     "custom/media": {
         "format": "{icon} {text}",
         "return-type": "json",
@@ -211,5 +214,5 @@
 	    		"suspend": "systemctl suspend",
 	    		"hibernate": "systemctl hibernate"
 	    	}
-    }
+    },
 }
