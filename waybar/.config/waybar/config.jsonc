@@ -21,12 +21,15 @@
         "temperature",
         "custom/gpu",
         "custom/memory",
-        "custom/discord",
-        "custom/steam",
+        "tray",
         "custom/power"
     ],
     "sway/mode": {
         "format": "<span style=\"italic\">{}</span>"
+    },
+    "tray": {
+        "icon-size": 14,
+        "spacing": 10
     },
     "clock": {
         "interval": 60,

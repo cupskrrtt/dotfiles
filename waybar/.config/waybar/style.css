@@ -91,6 +91,7 @@ button:hover {
 #temperature,
 #pulseaudio,
 #mode,
+#tray,
 #custom-discord,
 #custom-steam,
 #custom-memory,
@@ -127,6 +128,12 @@ button:hover {
     background-color: #964B00;
 }
 
+#tray {
+    color: @orange;
+    font-weight: bold;
+    border-top: 2px solid;
+}
+
 #pulseaudio {
     color: @yellow;
     font-weight: bold;
@@ -153,18 +160,6 @@ button:hover {
     border-top: 2px solid;
 }
 
-#custom-discord {
-    color: #7289DA;
-    font-weight: bold;
-    border-top: 2px solid;
-}
-
-#custom-steam {
-    color: #C7D5E0;
-    font-weight: bold;
-    border-top: 2px solid;
-}
-
 #custom-gpu {
     color: @green;
     font-weight: bold;
@@ -178,7 +173,7 @@ button:hover {
 }
 
 #custom-music {
-    color: @red1;
+    color: #FF4E6B;
     font-weight: bold;
     border-top: 2px solid;
 }
