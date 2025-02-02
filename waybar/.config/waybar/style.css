@@ -1,0 +1,194 @@
+@import "colorscheme.css";
+
+* {
+    /* `otf-font-awesome` is required to be installed for icons */
+    font-family: JetbrainsMono Nerd Font Propo;
+    padding: 0;
+    margin: 0;
+    border-radius: 0;
+    min-height: 0;
+    border: none;
+    text-shadow: none;
+    transition: none;
+    box-shadow: none;
+    color: @text;
+}
+
+window#waybar {
+    color: @fg;
+    background: @bg;
+    opacity: 0.9;
+}
+
+window#waybar.hidden {
+    opacity: 0.2;
+}
+
+/*
+window#waybar.empty {
+    background-color: transparent;
+}
+window#waybar.solo {
+    background-color: #FFFFFF;
+}
+*/
+
+window#waybar.termite {
+    background-color: #3F3F3F;
+}
+
+window#waybar.chromium {
+    background-color: #000000;
+    border: none;
+}
+
+/*button {
+     Use box-shadow instead of border so the text isn't offset 
+     box-shadow: inset 0 -3px transparent; 
+     Avoid rounded borders under each button name 
+    border: none;
+    border-radius: 1px;
+}*/
+
+/* https://github.com/Alexays/Waybar/wiki/FAQ#the-workspace-buttons-have-a-strange-hover-effect */
+/*
+button:hover {
+    background: inherit;
+    box-shadow: inset 0 3px @lavender;
+}*/
+
+#workspaces {
+    margin: 0px;
+}
+
+#workspaces button {
+    padding: 0 5px;
+    border-radius: 0px;
+}
+
+#workspaces button:hover {
+    background: @surface1
+}
+
+#workspaces button.focused {
+    background-color: @bg-highlight;
+    box-shadow: inset 0 2px @cyan;
+}
+
+#workspaces button.urgent {
+    color: @red;
+}
+
+#mode {
+    background-color: @bg-highlight;
+    box-shadow: inset 0 2px @cyan;
+}
+
+#clock,
+#cpu,
+#memory,
+#disk,
+#temperature,
+#pulseaudio,
+#mode,
+#tray,
+#custom-discord,
+#custom-steam,
+#custom-memory,
+#custom-gpu,
+#custom-weather,
+#custom-music,
+#custom-power {
+  padding: 0 5px;
+}
+
+/* If workspaces is the leftmost module, omit left margin */
+.modules-left > widget:first-child > #workspaces {
+    margin-left: 0;
+}
+
+/* If workspaces is the rightmost module, omit right margin */
+.modules-right > widget:last-child > #workspaces {
+    margin-right: 0;
+}
+
+#clock {
+    color: @magenta;
+    font-weight: bold;
+    border-top: 2px solid;
+}
+
+#cpu {
+    color: @green2;
+    font-weight: bold;
+    border-top: 2px solid;
+}
+
+#disk {
+    background-color: #964B00;
+}
+
+#tray {
+    color: @orange;
+    font-weight: bold;
+    border-top: 2px solid;
+}
+
+#pulseaudio {
+    color: @yellow;
+    font-weight: bold;
+    border-top: 2px solid;
+}
+
+#pulseaudio.muted {
+    color: @red;
+}
+
+#temperature {
+    color: @green1;
+    font-weight: bold;
+    border-top: 2px solid;
+}
+
+#temperature.critical {
+    color: @red;
+}
+
+#custom-memory {
+    color: @cyan;
+    font-weight: bold;
+    border-top: 2px solid;
+}
+
+#custom-gpu {
+    color: @green;
+    font-weight: bold;
+    border-top: 2px solid;
+}
+
+#custom-weather {
+    color: @blue5;
+    font-weight: bold;
+    border-top: 2px solid;
+}
+
+#custom-music {
+    color: #FF4E6B;
+    font-weight: bold;
+    border-top: 2px solid;
+}
+
+#custom-power {
+    color: @red1;
+    font-weight: bold;
+    border-top: 2px solid;
+}
+
+menu {
+	border-radius: 0px;
+	background: #161320;
+	color: #B5E8E0;
+}
+menuitem {
+	border-radius: 0px;
+}
