@@ -8,6 +8,7 @@
       "cloudflare-warp"
       "font-hack-nerd-font"
       "stremio"
+      "love"
     ];
     masApps = {
       "Ghostery" = 6504861501;
