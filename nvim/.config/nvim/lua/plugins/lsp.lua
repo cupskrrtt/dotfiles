@@ -29,12 +29,12 @@ return {
       --     vim.keymap.set("n", "<leader>ca", ":lua vim.lsp.buf.code_action()<CR>")
       --   end
       -- })
-
+      
       lspconfig.lua_ls.setup({
         settings = {
           Lua = {
             runtime = {
-              version = "Lua 5.1", -- Lua version
+              version = "LuaJIT", -- Lua version
               path = vim.split(package.path, ';'),
             },
             diagnostics = {
@@ -43,9 +43,8 @@ return {
             workspace = {
               checkThirdParty = true,
               library = {
-                [vim.fn.expand('$VIMRUNTIME/lua')] = true,
-                [vim.fn.expand('$VIMRUNTIME/lua/vim/lsp')] = true,
-                [vim.fn.expand('${3rd}/love2d/library')] = true
+                vim.env.VIMRUNTIME,
+                '${3rd}/love2d/library'
               }
             },
           },
@@ -133,6 +132,7 @@ return {
           json = { "biome", "prettier", stop_after_first = true },
           html = { "biome", "prettier", stop_after_first = true },
           css = { "biome", "prettier", stop_after_first = true },
+          lua = { "stylua", stop_after_first = true}
         },
         format_after_save = {
           lsp_format = "fallback",
