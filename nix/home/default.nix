@@ -30,6 +30,7 @@ in
 	      btop
 	      eza
         gitleaks
+        discord
 	
 	      # Languages and development tools
         bun
@@ -52,7 +53,6 @@ in
 		".tmux.conf".source = config.lib.file.mkOutOfStoreSymlink "${homeDir}/dotfiles/tmux/.tmux.conf";
 		".config/nvim".source = config.lib.file.mkOutOfStoreSymlink "${homeDir}/dotfiles/nvim/.config/nvim";
     ".config/starship.toml".source = config.lib.file.mkOutOfStoreSymlink "${homeDir}/dotfiles/starship/.config/starship.toml";
-    ".config/aerospace".source = config.lib.file.mkOutOfStoreSymlink "${homeDir}/dotfiles/aerospace/.config/aerospace";
 	    };
 	
 	    stateVersion = "24.05";

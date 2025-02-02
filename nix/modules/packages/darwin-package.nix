@@ -5,5 +5,6 @@
     pkgs.mkalias
     pkgs.alacritty
     pkgs.starship
+    pkgs.rqbit
   ];
 }

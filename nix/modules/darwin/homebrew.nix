@@ -7,6 +7,7 @@
     casks = [
       "cloudflare-warp"
       "font-hack-nerd-font"
+      "stremio"
     ];
     masApps = {
       "Ghostery" = 6504861501;
