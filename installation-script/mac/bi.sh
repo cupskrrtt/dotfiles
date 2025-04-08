@@ -10,4 +10,3 @@ brew install typescript-language-server
 brew install eza
 brew install starship
 brew install discord
-brew install --cask cloudflare-warp
