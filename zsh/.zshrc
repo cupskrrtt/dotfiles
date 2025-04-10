@@ -4,7 +4,7 @@
 # ALIAS #
 #=======#
 
-alias ls="exa --long --header --all --icons"
+alias ls="eza --long --header --all --icons"
 
 #==========#
 # AUTOLOAD #
@@ -24,7 +24,7 @@ zstyle ':completion:*' menu select
 # PLUGINS #
 #=========#
 
-source /usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+source $HOMEBREW_PREFIX/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 
 #======#
 # EVAL #
