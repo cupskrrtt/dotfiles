@@ -23,7 +23,7 @@ include colorscheme
 ### Output configuration
 #
 # Default wallpaper (more resolutions are available in /usr/share/backgrounds/sway/)
-output * bg ~/Downloads/vibrant-gate.png fill
+# output * bg ~/Downloads/vibrant-gate.png fill
 #
 # Example configuration:
 #
