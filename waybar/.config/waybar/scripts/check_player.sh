@@ -2,7 +2,7 @@
 
 # Find the correct Firefox instance running Apple Music
 player=$(playerctl -l | grep "firefox" | while read line; do
-    if playerctl -p "$line" metadata 2>/dev/null | grep -q "music.apple.com"; then
+    if playerctl -p "$line" metadata 2>/dev/null | grep -q "music.youtube.com"; then
         echo "$line"
         break
     fi

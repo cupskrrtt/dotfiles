@@ -24,7 +24,13 @@ zstyle ':completion:*' menu select
 # PLUGINS #
 #=========#
 
-source $HOMEBREW_PREFIX/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+# Check if the zsh-syntax-highlighting plugin is installed in the default system location
+if [[ -f /usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh ]]; then
+  source /usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+# If the default system location doesn't exist, check for the Homebrew installation
+elif [[ -f $HOMEBREW_PREFIX/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh ]]; then
+  source $HOMEBREW_PREFIX/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+fi
 
 #======#
 # EVAL #
@@ -39,3 +45,7 @@ case ":$PATH:" in
   *) export PATH="$PNPM_HOME:$PATH" ;;
 esac
 # pnpm end
+#
+
+# nvm
+source /usr/share/nvm/init-nvm.sh

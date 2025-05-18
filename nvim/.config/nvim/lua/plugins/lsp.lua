@@ -4,6 +4,7 @@ return {
     "neovim/nvim-lspconfig",
     dependencies = {
       { "hrsh7th/cmp-nvim-lsp" },
+
     },
     config = function()
       ---
@@ -29,13 +30,13 @@ return {
       --     vim.keymap.set("n", "<leader>ca", ":lua vim.lsp.buf.code_action()<CR>")
       --   end
       -- })
-      
+
       lspconfig.lua_ls.setup({
         settings = {
           Lua = {
             runtime = {
               version = "LuaJIT", -- Lua version
-              path = vim.split(package.path, ';'),
+              path = vim.split(package.path, ";"),
             },
             diagnostics = {
               globals = { "vim", "love", "jit" },
@@ -44,12 +45,49 @@ return {
               checkThirdParty = true,
               library = {
                 vim.env.VIMRUNTIME,
-                '${3rd}/love2d/library'
-              }
+                "${3rd}/love2d/library",
+              },
             },
           },
         },
       })
+      lspconfig.pyright.setup({
+        settings = {
+          pyright = {
+            -- Using Ruff's import organizer
+            disableOrganizeImports = true,
+          },
+          python = {
+            analysis = {
+              -- Ignore all files for analysis to exclusively use Ruff for linting
+              ignore = { '*' },
+            },
+          },
+        },
+      })
+      --lspconfig.jedi_language_server.setup({})
+      --lspconfig.pylsp.setup({
+      --  plugins = {
+      --    autopep8 = {
+      --      enabled = false,
+      --    },
+      --    yapf = {
+      --      enabled = true,
+      --    },
+      --    rope_autoimport = {
+      --      enabled = true,
+      --      completions = {
+      --        enabled = true
+      --      },
+      --      code_actions = {
+      --        enabled = true
+      --      }
+      --    },
+      --    rope_completion = {
+      --      enabled = true
+      --    }
+      --  }
+      --})
       lspconfig.gopls.setup({})
       lspconfig.ts_ls.setup({})
       lspconfig.html.setup({
@@ -57,8 +95,8 @@ return {
           "html",
           "templ",
           "javascriptreact",
-          "typescriptreact"
-        }
+          "typescriptreact",
+        },
       })
       lspconfig.tailwindcss.setup({
         settings = {
@@ -66,18 +104,19 @@ return {
             experimental = {
               classRegex = {
                 { "cva\\(([^)]*)\\)", "[\"'`]([^\"'`]*).*?[\"'`]" },
-                { "cx\\(([^)]*)\\)",  "(?:'|\"|`)([^']*)(?:'|\"|`)" }
-              }
-            }
-          }
-        }
+                { "cx\\(([^)]*)\\)",  "(?:'|\"|`)([^']*)(?:'|\"|`)" },
+              },
+            },
+          },
+        },
       })
       lspconfig.prismals.setup({})
       lspconfig.cssls.setup({})
       lspconfig.sqlls.setup({
         cmd = { "sql-language-server", "up", "--method", "stdio" },
       })
-    end
+      lspconfig.clangd.setup({})
+    end,
   },
 
   --Completion
@@ -97,12 +136,12 @@ return {
       local luasnip = require("luasnip")
 
       cmp.setup({
-        sources = cmp.config.sources {
+        sources = cmp.config.sources({
           { name = "nvim_lsp", keyword_length = 1 },
-          { name = "luasnip",  keyword_length = 2 }
-        },
+          { name = "luasnip",  keyword_length = 2 },
+        }),
         window = {
-          documentation = cmp.config.window.bordered()
+          documentation = cmp.config.window.bordered(),
         },
         snippet = {
           expand = function(args)
@@ -112,10 +151,10 @@ return {
         mapping = cmp.mapping.preset.insert({
           ["<C-k>"] = cmp.mapping.select_prev_item(),
           ["<C-j>"] = cmp.mapping.select_next_item(),
-          ["<CR>"] = cmp.mapping.confirm({ behavior = cmp.ConfirmBehavior.Replace, select = true, }),
+          ["<CR>"] = cmp.mapping.confirm({ behavior = cmp.ConfirmBehavior.Replace, select = true }),
         }),
       })
-    end
+    end,
   },
 
   --Formatter
@@ -132,12 +171,38 @@ return {
           json = { "biome", "prettier", stop_after_first = true },
           html = { "biome", "prettier", stop_after_first = true },
           css = { "biome", "prettier", stop_after_first = true },
-          lua = { "stylua", stop_after_first = true}
+          lua = { "stylua", stop_after_first = true },
+          python = { "ruff_fix", "ruff_format", "ruff_organize_imports" }
         },
         format_after_save = {
           lsp_format = "fallback",
-        }
+        },
+      })
+    end,
+  },
+
+  --Linter
+  {
+    "mfussenegger/nvim-lint",
+    event = { "BufReadPre", "BufNewFile" },
+    config = function()
+      local lint = require("lint")
+      lint.linters_by_ft = {
+        python = { "ruff" },
+        javascript = { "eslint" },
+        javascriptreact = { "eslint" },
+        typescript = { "eslint" },
+        typescriptreact = { "eslint" },
+      }
+
+      local lint_augroup = vim.api.nvim_create_augroup("lint", { clear = true })
+
+      vim.api.nvim_create_autocmd({ "BufEnter", "BufWritePost", "TextChanged" }, {
+        group = lint_augroup,
+        callback = function()
+          lint.try_lint()
+        end,
       })
     end
-  },
+  }
 }

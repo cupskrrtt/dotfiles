@@ -45,14 +45,15 @@
         "format": "RAM {used}"
     },
     "temperature": {
-        "hwmon-path": "/sys/class/hwmon/hwmon1/temp1_input",
+        "hwmon-path": "/sys/class/hwmon/hwmon2/temp1_input",
+        "interval": 15,
         "critical-threshold": 80,
         "format-critical": "{temperatureC}°C {icon}",
         "format": "{temperatureC}°C {icon}",
         "format-icons": ["\uf2cb", "\uf2c9", "\uf2c7"]
     },
     "pulseaudio": {
-        "format": "\udb81\udcc3 {volume}%",
+        "format": "\udb81\udcc3 {volume}%"
     },
     "custom/discord": {
         "format": "{}",
@@ -71,9 +72,10 @@
         "interval": 5
     },
     "custom/gpu": {
-      "format": "{}°C {icon}",
-      "exec": "nvidia-smi --query-gpu=temperature.gpu --format=csv,noheader",
-      "format-icons": ["\uf2cb", "\uf2c9", "\uf2c7"]
+        "format": "{} {icon}",
+        "interval": 2,
+        "exec": "awk '{printf \"%.1f°C\\n\", $1/1000}' /sys/class/drm/card1/device/hwmon/hwmon1/temp1_input",
+        "format-icons": ["\uf2cb", "\uf2c9", "\uf2c7"]
     },
     "custom/memory": {
         "exec": "$HOME/dotfiles/waybar/.config/waybar/scripts/memory_usage.sh",
