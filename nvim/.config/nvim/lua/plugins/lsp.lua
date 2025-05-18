@@ -4,6 +4,7 @@ return {
     "neovim/nvim-lspconfig",
     dependencies = {
       { "hrsh7th/cmp-nvim-lsp" },
+
     },
     config = function()
       ---
@@ -50,7 +51,43 @@ return {
           },
         },
       })
-      lspconfig.pylsp.setup({})
+      lspconfig.pyright.setup({
+        settings = {
+          pyright = {
+            -- Using Ruff's import organizer
+            disableOrganizeImports = true,
+          },
+          python = {
+            analysis = {
+              -- Ignore all files for analysis to exclusively use Ruff for linting
+              ignore = { '*' },
+            },
+          },
+        },
+      })
+      --lspconfig.jedi_language_server.setup({})
+      --lspconfig.pylsp.setup({
+      --  plugins = {
+      --    autopep8 = {
+      --      enabled = false,
+      --    },
+      --    yapf = {
+      --      enabled = true,
+      --    },
+      --    rope_autoimport = {
+      --      enabled = true,
+      --      completions = {
+      --        enabled = true
+      --      },
+      --      code_actions = {
+      --        enabled = true
+      --      }
+      --    },
+      --    rope_completion = {
+      --      enabled = true
+      --    }
+      --  }
+      --})
       lspconfig.gopls.setup({})
       lspconfig.ts_ls.setup({})
       lspconfig.html.setup({
@@ -135,6 +172,7 @@ return {
           html = { "biome", "prettier", stop_after_first = true },
           css = { "biome", "prettier", stop_after_first = true },
           lua = { "stylua", stop_after_first = true },
+          python = { "ruff_fix", "ruff_format", "ruff_organize_imports" }
         },
         format_after_save = {
           lsp_format = "fallback",
@@ -142,4 +180,29 @@ return {
       })
     end,
   },
+
+  --Linter
+  {
+    "mfussenegger/nvim-lint",
+    event = { "BufReadPre", "BufNewFile" },
+    config = function()
+      local lint = require("lint")
+      lint.linters_by_ft = {
+        python = { "ruff" },
+        javascript = { "eslint" },
+        javascriptreact = { "eslint" },
+        typescript = { "eslint" },
+        typescriptreact = { "eslint" },
+      }
+
+      local lint_augroup = vim.api.nvim_create_augroup("lint", { clear = true })
+
+      vim.api.nvim_create_autocmd({ "BufEnter", "BufWritePost", "TextChanged" }, {
+        group = lint_augroup,
+        callback = function()
+          lint.try_lint()
+        end,
+      })
+    end
+  }
 }

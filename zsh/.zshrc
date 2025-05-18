@@ -45,11 +45,7 @@ case ":$PATH:" in
   *) export PATH="$PNPM_HOME:$PATH" ;;
 esac
 # pnpm end
+#
 
-# Added by LM Studio CLI (lms)
-export PATH="$PATH:/home/cup/.lmstudio/bin"
-# End of LM Studio CLI section
-
-
-# Created by `pipx` on 2025-05-14 07:45:23
-export PATH="$PATH:/home/cup/.local/bin"
+# nvm
+source /usr/share/nvm/init-nvm.sh
