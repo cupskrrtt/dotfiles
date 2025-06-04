@@ -24,7 +24,6 @@ style = "Regular"
 history = 5000
 
 [window]
-decorations = "none"
 opacity = 0.9
 
 [window.class]
