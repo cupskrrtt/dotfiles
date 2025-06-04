@@ -45,7 +45,12 @@ case ":$PATH:" in
   *) export PATH="$PNPM_HOME:$PATH" ;;
 esac
 # pnpm end
-#
+
+# gopath
+export PATH="$PATH:$(go env GOBIN):$(go env GOPATH)/bin"
+
+# proto
+export PATH="$PATH:$HOME/.proto/bin/proto-shim:$HOME/.proto/bin"
 
 # nvm
 source /usr/share/nvm/init-nvm.sh

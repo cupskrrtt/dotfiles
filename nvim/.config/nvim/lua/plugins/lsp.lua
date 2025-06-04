@@ -1,122 +1,16 @@
 return {
   --LSP
   {
-    "neovim/nvim-lspconfig",
-    dependencies = {
-      { "hrsh7th/cmp-nvim-lsp" },
-
+    "mason-org/mason-lspconfig.nvim",
+    opts = {
+      ensure_installed = { "lua_ls", "pyright", "ts_ls", "gopls", "vue_ls", "tailwindcss", "html", "cssls" }
     },
-    config = function()
-      ---
-      -- LSP Config
-      ---
-      local lspconfig = require("lspconfig")
-
-      lspconfig.util.default_config.capabilities = vim.tbl_deep_extend(
-        "force",
-        lspconfig.util.default_config.capabilities,
-        require("cmp_nvim_lsp").default_capabilities()
-      )
-
-      -- vim.api.nvim_create_autocmd("LspAttach", {
-      --   desc = "LSP actions",
-      --   callback = function(event)
-      --     local opts = { buffer = event.buf }
-      --     vim.keymap.set("n", "<leader>dh", ":lua vim.lsp.diagnostic.open_diagnostic()<CR>")
-      --     vim.keymap.set("n", "<leader>dd", ":lua vim.lsp.buf.definition()<CR>")
-      --     vim.keymap.set("n", "<leader>di", ":lua vim.lsp.buf.implementation()<CR>")
-      --     vim.keymap.set("n", "<leader>dt", ":lua vim.lsp.buf.type_definition()<CR>")
-      --     vim.keymap.set("n", "<leader>dr", ":lua vim.lsp.buf.references()<CR>")
-      --     vim.keymap.set("n", "<leader>ca", ":lua vim.lsp.buf.code_action()<CR>")
-      --   end
-      -- })
-
-      lspconfig.lua_ls.setup({
-        settings = {
-          Lua = {
-            runtime = {
-              version = "LuaJIT", -- Lua version
-              path = vim.split(package.path, ";"),
-            },
-            diagnostics = {
-              globals = { "vim", "love", "jit" },
-            },
-            workspace = {
-              checkThirdParty = true,
-              library = {
-                vim.env.VIMRUNTIME,
-                "${3rd}/love2d/library",
-              },
-            },
-          },
-        },
-      })
-      lspconfig.pyright.setup({
-        settings = {
-          pyright = {
-            -- Using Ruff's import organizer
-            disableOrganizeImports = true,
-          },
-          python = {
-            analysis = {
-              -- Ignore all files for analysis to exclusively use Ruff for linting
-              ignore = { '*' },
-            },
-          },
-        },
-      })
-      --lspconfig.jedi_language_server.setup({})
-      --lspconfig.pylsp.setup({
-      --  plugins = {
-      --    autopep8 = {
-      --      enabled = false,
-      --    },
-      --    yapf = {
-      --      enabled = true,
-      --    },
-      --    rope_autoimport = {
-      --      enabled = true,
-      --      completions = {
-      --        enabled = true
-      --      },
-      --      code_actions = {
-      --        enabled = true
-      --      }
-      --    },
-      --    rope_completion = {
-      --      enabled = true
-      --    }
-      --  }
-      --})
-      lspconfig.gopls.setup({})
-      lspconfig.ts_ls.setup({})
-      lspconfig.html.setup({
-        filetypes = {
-          "html",
-          "templ",
-          "javascriptreact",
-          "typescriptreact",
-        },
-      })
-      lspconfig.tailwindcss.setup({
-        settings = {
-          tailwindCSS = {
-            experimental = {
-              classRegex = {
-                { "cva\\(([^)]*)\\)", "[\"'`]([^\"'`]*).*?[\"'`]" },
-                { "cx\\(([^)]*)\\)",  "(?:'|\"|`)([^']*)(?:'|\"|`)" },
-              },
-            },
-          },
-        },
-      })
-      lspconfig.prismals.setup({})
-      lspconfig.cssls.setup({})
-      lspconfig.sqlls.setup({
-        cmd = { "sql-language-server", "up", "--method", "stdio" },
-      })
-      lspconfig.clangd.setup({})
-    end,
+    dependencies = {
+      {
+        "mason-org/mason.nvim",
+      },
+      "neovim/nvim-lspconfig",
+    },
   },
 
   --Completion
@@ -137,8 +31,28 @@ return {
 
       cmp.setup({
         sources = cmp.config.sources({
-          { name = "nvim_lsp", keyword_length = 1 },
-          { name = "luasnip",  keyword_length = 2 },
+          {
+            name = "nvim_lsp",
+            keyword_length = 1,
+            entry_filter = function(entry, ctx)
+              -- Check if the buffer type is 'vue'
+              if ctx.filetype ~= 'vue' then
+                return true
+              end
+
+              local cursor_before_line = ctx.cursor_before_line
+              -- For events
+              if cursor_before_line:sub(-1) == '@' then
+                return entry.completion_item.label:match('^@')
+                -- For props also exclude events with `:on-` prefix
+              elseif cursor_before_line:sub(-1) == ':' then
+                return entry.completion_item.label:match('^:') and not entry.completion_item.label:match('^:on%-')
+              else
+                return true
+              end
+            end
+          },
+          { name = "luasnip", keyword_length = 2 },
         }),
         window = {
           documentation = cmp.config.window.bordered(),
