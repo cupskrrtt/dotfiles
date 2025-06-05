@@ -23,3 +23,5 @@ brew install supabase/tap/supabase
 brew install nmap
 brew install uv
 brew install pyright
+brew install nvm
+brew install go

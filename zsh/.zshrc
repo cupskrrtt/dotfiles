@@ -45,7 +45,28 @@ case ":$PATH:" in
   *) export PATH="$PNPM_HOME:$PATH" ;;
 esac
 # pnpm end
-#
+
+# GOlang
+# Set GOPATH (optional, if not already set)
+export GOPATH=$HOME/go
+
+# Add Go binary path to PATH
+export PATH=$PATH:$GOPATH/bin
 
 # nvm
-source /usr/share/nvm/init-nvm.sh
+export NVM_DIR="$HOME/.nvm"
+
+# Check for nvm installed via Homebrew
+if [[ -s "$HOMEBREW_PREFIX/opt/nvm/nvm.sh" ]]; then
+  source "$HOMEBREW_PREFIX/opt/nvm/nvm.sh"
+  [[ -s "$HOMEBREW_PREFIX/opt/nvm/etc/bash_completion.d/nvm" ]] && source "$HOMEBREW_PREFIX/opt/nvm/etc/bash_completion.d/nvm"
+
+# Check for nvm installed manually in $NVM_DIR
+elif [[ -s "$NVM_DIR/nvm.sh" ]]; then
+  source "$NVM_DIR/nvm.sh"
+  [[ -s "$NVM_DIR/bash_completion" ]] && source "$NVM_DIR/bash_completion"
+
+# Check for system-wide nvm (Linux-specific)
+elif [[ -f /usr/share/nvm/init-nvm.sh ]]; then
+  source /usr/share/nvm/init-nvm.sh
+fi
