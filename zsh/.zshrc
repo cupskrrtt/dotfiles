@@ -50,8 +50,11 @@ esac
 # Set GOPATH (optional, if not already set)
 export GOPATH=$HOME/go
 
-# Add Go binary path to PATH
-export PATH=$PATH:$GOPATH/bin
+# gopath
+export PATH="$PATH:$(go env GOBIN):$(go env GOPATH)/bin"
+
+# proto
+export PATH="$PATH:$HOME/.proto/bin/proto-shim:$HOME/.proto/bin"
 
 # nvm
 export NVM_DIR="$HOME/.nvm"
