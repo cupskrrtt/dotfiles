@@ -3,7 +3,7 @@ return {
   {
     "mason-org/mason-lspconfig.nvim",
     opts = {
-      ensure_installed = { "lua_ls", "pyright", "ts_ls", "gopls", "vue_ls", "tailwindcss", "html", "cssls" }
+      ensure_installed = { "lua_ls", "pyright", "ts_ls", "gopls", "vue_ls", "tailwindcss", "html", "cssls" },
     },
     dependencies = {
       {
