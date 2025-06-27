@@ -26,9 +26,9 @@ vim.opt.smarttab = true
 vim.opt.breakindent = true
 vim.opt.shiftwidth = 2
 vim.opt.tabstop = 2
-vim.opt.ai = true             --auto indent
-vim.opt.si = true             --smart indent
-vim.opt.wrap = false          --no wrap line
+vim.opt.ai = true --auto indent
+vim.opt.si = true --smart indent
+vim.opt.wrap = false --no wrap line
 vim.opt.backspace = "start,eol,indent"
 vim.opt.path:append({ "**" }) --finding files - search down into subfolder
 vim.opt.wildignore:append({ "*/node_modules/*" })
