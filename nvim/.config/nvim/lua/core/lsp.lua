@@ -1,4 +1,4 @@
-vim.lsp.enable({ "lua_ls", "html", "ts_ls", "vue_ls", "tailwindcss", "cssls" })
+vim.lsp.enable({ "lua_ls", "ts_ls", "vue_ls" })
 
 vim.diagnostic.config({
 	virtual_lines = true,

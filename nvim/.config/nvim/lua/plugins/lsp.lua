@@ -1,9 +1,29 @@
 return {
 	--LSP
 	{
-		{
-			"mason-org/mason.nvim",
-			opts = {},
+		"mason-org/mason-lspconfig.nvim",
+		opts = {
+			ensure_installed = {
+				"lua_ls",
+				"pyright",
+				"ts_ls",
+				"gopls",
+				"vue_ls",
+				"tailwindcss",
+				"html",
+				"cssls",
+			},
+			automatic_enable = {
+				exclude = {
+					"ts_ls",
+					"vue_ls",
+					"lua_ls",
+				},
+			},
+		},
+		dependencies = {
+			{ "mason-org/mason.nvim", opts = {} },
+			"neovim/nvim-lspconfig",
 		},
 	},
 
