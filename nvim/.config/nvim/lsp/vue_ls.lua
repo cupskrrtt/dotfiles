@@ -12,5 +12,8 @@ return {
 			-- replace with your global TypeScript library path
 			tsdk = "/home/cup/.local/share/pnpm/global/5/node_modules/typescript/lib",
 		},
+		vue = {
+			hybridMode = false,
+		},
 	},
 }

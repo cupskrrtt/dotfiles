@@ -10,12 +10,12 @@ return {
 	cmd = { "typescript-language-server", "--stdio" },
 	filetypes = { "javascript", "typescript", "javascriptreact", "typescriptreact" },
 	--init_options = {
-	--  plugins = {
-	--    {
-	--      name = '@vue/typescript-plugin',
-	--      location = vue_language_server_path,
-	--      languages = { 'vue' },
-	--    },
-	--  },
-	--}
+	--	plugins = {
+	--		{
+	--			name = "@vue/typescript-plugin",
+	--			location = vue_language_server_path,
+	--			languages = { "vue", "typescript", "javascript" },
+	--		},
+	--	},
+	--},
 }
