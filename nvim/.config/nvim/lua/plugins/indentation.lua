@@ -1,9 +1,9 @@
 return {
-  {
-    "nvimdev/indentmini.nvim",
-    opts = {},
-    config = function()
-      require("indentmini").setup()
-    end
-  }
+	{
+		"nvimdev/indentmini.nvim",
+		opts = {},
+		config = function()
+			require("indentmini").setup()
+		end,
+	},
 }
