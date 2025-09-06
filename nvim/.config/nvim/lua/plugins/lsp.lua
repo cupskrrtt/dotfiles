@@ -6,7 +6,6 @@ return {
 			ensure_installed = {
 				"lua_ls",
 				"pyright",
-				"ts_ls",
 				"gopls",
 				"vue_ls",
 				"tailwindcss",
@@ -15,14 +14,22 @@ return {
 			},
 			automatic_enable = {
 				exclude = {
-					"ts_ls",
+					"vtsls",
 					"vue_ls",
 					"lua_ls",
 				},
 			},
 		},
 		dependencies = {
-			{ "mason-org/mason.nvim", opts = {} },
+			{
+				"mason-org/mason.nvim",
+				opts = {
+					registries = {
+						"github:mason-org/mason-registry",
+						"github:Crashdummyy/mason-registry",
+					},
+				},
+			},
 			"neovim/nvim-lspconfig",
 		},
 	},
@@ -34,18 +41,31 @@ return {
 		config = function()
 			require("conform").setup({
 				formatters_by_ft = {
-					javascript = { "biome", "prettier", stop_after_first = true },
-					javascriptreact = { "biome", "prettier", stop_after_first = true },
-					typescript = { "biome", "prettier", stop_after_first = true },
-					typescriptreact = { "biome", "prettier", stop_after_first = true },
-					json = { "biome", "prettier", stop_after_first = true },
-					html = { "biome", "prettier", stop_after_first = true },
-					css = { "biome", "prettier", stop_after_first = true },
+					javascript = { "biome", "prettier", "prettierd", stop_after_first = true },
+					javascriptreact = { "biome", "prettier", "prettierd", stop_after_first = true },
+					typescript = { "biome", "prettier", "prettierd", stop_after_first = true },
+					typescriptreact = { "biome", "prettier", "prettierd", stop_after_first = true },
+					json = { "biome", "prettier", "prettierd", stop_after_first = true },
+					html = { "biome", "prettier", "prettierd", stop_after_first = true },
+					css = { "biome", "prettier", "prettierd", stop_after_first = true },
 					lua = { "stylua", stop_after_first = true },
 					python = { "ruff_fix", "ruff_format", "ruff_organize_imports" },
+					vue = { "prettier", "prettierd", stop_after_first = true },
+					cs = { "csharpier", stop_after_first = true },
 				},
 				format_after_save = {
 					lsp_format = "fallback",
+				},
+				formatters = {
+					csharpier = {
+						command = "dotnet",
+						args = {
+							"csharpier",
+							"format",
+							"--write-stdout",
+						},
+						to_stdin = true,
+					},
 				},
 			})
 		end,
@@ -59,10 +79,11 @@ return {
 			local lint = require("lint")
 			lint.linters_by_ft = {
 				python = { "ruff" },
-				javascript = { "eslint" },
-				javascriptreact = { "eslint" },
-				typescript = { "eslint" },
-				typescriptreact = { "eslint" },
+				javascript = { "biomejs" },
+				javascriptreact = { "biomejs" },
+				typescript = { "biomejs" },
+				typescriptreact = { "biomejs" },
+				vue = { "eslint_d" },
 			}
 
 			local lint_augroup = vim.api.nvim_create_augroup("lint", { clear = true })

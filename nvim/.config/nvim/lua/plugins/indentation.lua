@@ -1,9 +1,11 @@
 return {
-	{
-		"nvimdev/indentmini.nvim",
-		opts = {},
-		config = function()
-			require("indentmini").setup()
-		end,
+	"lukas-reineke/indent-blankline.nvim",
+	main = "ibl",
+	---@module "ibl"
+	---@type ibl.config
+	opts = {
+		indent = { char = "|" },
+		scope = { enabled = true, show_start = true, show_end = false },
+		whitespace = { remove_blankline_trail = true },
 	},
 }
