@@ -1,4 +1,22 @@
-# ZSH CONFIG
+#=======#
+# PATHS #
+#=======#
+
+# Define tool directories
+export GOPATH="$HOME/go"
+export PNPM_HOME="$HOME/.local/share/pnpm"
+export NVM_DIR="$HOME/.nvm"
+export GTK_USE_PORTAL=1
+
+# Cleanly prepend paths (ensures no duplicates)
+typeset -U path
+path=(
+	"$HOME/.local/bin"
+  "$PNPM_HOME"
+  "$GOPATH/bin"
+  "$(go env GOBIN 2>/dev/null)"
+  "$path[@]"
+)
 
 #=======#
 # ALIAS #
@@ -13,71 +31,40 @@ alias ls="eza --long --header --all --icons"
 autoload -Uz compinit promptinit
 compinit
 promptinit
-
-#========#
-# ZSTYLE #
-#========#
-
 zstyle ':completion:*' menu select
 
 #=========#
 # PLUGINS #
 #=========#
 
-# Check if the zsh-syntax-highlighting plugin is installed in the default system location
-if [[ -f /usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh ]]; then
-  source /usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
-# If the default system location doesn't exist, check for the Homebrew installation
-elif [[ -f $HOMEBREW_PREFIX/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh ]]; then
-  source $HOMEBREW_PREFIX/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
-fi
+# Helper to source files if they exist
+source_if_exists() {
+  [[ -f "$1" ]] && source "$1"
+}
+
+# Syntax Highlighting
+source_if_exists "/usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
+source_if_exists "$HOMEBREW_PREFIX/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
+
+# NVM Load (Prioritize Brew, then Local, then System)
+NVM_LOCATIONS=(
+  "$HOMEBREW_PREFIX/opt/nvm/nvm.sh"
+  "$NVM_DIR/nvm.sh"
+  "/usr/share/nvm/init-nvm.sh"
+)
+
+for nvm_path in $NVM_LOCATIONS; do
+  if [[ -f "$nvm_path" ]]; then
+    source "$nvm_path"
+    # Load completion if not on system-wide init
+    [[ -f "${nvm_path%/*}/bash_completion" ]] && source "${nvm_path%/*}/bash_completion"
+    break
+  fi
+done
 
 #======#
 # EVAL #
 #======#
 
 eval "$(starship init zsh)"
-
-# pnpm
-export PNPM_HOME="/home/cup/.local/share/pnpm"
-case ":$PATH:" in
-  *":$PNPM_HOME:"*) ;;
-  *) export PATH="$PNPM_HOME:$PATH" ;;
-esac
-# pnpm end
-
-# GOlang
-# Set GOPATH (optional, if not already set)
-export GOPATH=$HOME/go
-
-# gopath
-export PATH="$PATH:$(go env GOBIN):$(go env GOPATH)/bin"
-
-# proto
-export PATH="$PATH:$HOME/.proto/bin/proto-shim:$HOME/.proto/bin"
-
-# flutter
-export PATH="$HOME/sdks/flutter/bin:$PATH"
-
-# chrome for flutter
-export CHROME_EXECUTABLE=/usr/bin/google-chrome-stable
-
 export DISPLAY=:0
-
-# nvm
-export NVM_DIR="$HOME/.nvm"
-
-# Check for nvm installed via Homebrew
-if [[ -s "$HOMEBREW_PREFIX/opt/nvm/nvm.sh" ]]; then
-  source "$HOMEBREW_PREFIX/opt/nvm/nvm.sh"
-  [[ -s "$HOMEBREW_PREFIX/opt/nvm/etc/bash_completion.d/nvm" ]] && source "$HOMEBREW_PREFIX/opt/nvm/etc/bash_completion.d/nvm"
-
-# Check for nvm installed manually in $NVM_DIR
-elif [[ -s "$NVM_DIR/nvm.sh" ]]; then
-  source "$NVM_DIR/nvm.sh"
-  [[ -s "$NVM_DIR/bash_completion" ]] && source "$NVM_DIR/bash_completion"
-
-# Check for system-wide nvm (Linux-specific)
-elif [[ -f /usr/share/nvm/init-nvm.sh ]]; then
-  source /usr/share/nvm/init-nvm.sh
-fi

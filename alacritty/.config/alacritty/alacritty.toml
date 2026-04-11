@@ -33,4 +33,4 @@ instance = "Alacritty"
 [general]
 live_config_reload = true
 
-import = ["~/.config/alacritty/colorscheme.toml"]
+import = ["~/.config/alacritty/themes/noctalia.toml"]

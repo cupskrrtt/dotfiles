@@ -52,7 +52,7 @@ input {
 
     trackpoint {
         // off
-        // natural-scroll
+        // natural-scroli
         // accel-speed 0.2
         // accel-profile "flat"
         // scroll-method "on-button-down"
@@ -122,6 +122,8 @@ layout {
     // - "on-overflow", focusing a column will center it if it doesn't fit
     //   together with the previously focused column.
     center-focused-column "never"
+
+	background-color "transparent"
 
     // You can customize the widths that "switch-preset-column-width" (Mod+R) toggles between.
     preset-column-widths {
@@ -199,7 +201,7 @@ layout {
         // If you enable the border, you probably want to disable the focus ring.
         //off
 
-        width 4
+        width 2
         active-color "#ffc87f"
         inactive-color "#505050"
 
@@ -274,7 +276,7 @@ layout {
 //spawn-at-startup "mako"
 // 
 // To run a shell command (with variables, pipes, etc.), use spawn-sh-at-startup:
-//spawn-sh-at-startup "qs -c noctalia-shell"
+spawn-sh-at-startup "qs -c noctalia-shell"
 
 hotkey-overlay {
     // Uncomment this line to disable the "Important Hotkeys" pop-up at startup.
@@ -291,7 +293,7 @@ prefer-no-csd
 // You can change the path where screenshots are saved.
 // A ~ at the front will be expanded to the home directory.
 // The path is formatted with strftime(3) to give you the screenshot date and time.
-screenshot-path "~/Pictures/Screenshots/Screenshot from %Y-%m-%d %H-%M-%S.png"
+// screenshot-path "~/Pictures/Screenshots/Screenshot from %Y-%m-%d %H-%M-%S.png"
 
 // You can also set this to null to disable saving screenshots to disk.
 // screenshot-path null
@@ -332,7 +334,7 @@ window-rule {
 
 // Example: block out two password managers from screen capture.
 // (This example rule is commented out with a "/-" in front.)
-/-window-rule {
+window-rule {
     match app-id=r#"^org\.keepassxc\.KeePassXC$"#
     match app-id=r#"^org\.gnome\.World\.Secrets$"#
 
@@ -344,14 +346,28 @@ window-rule {
 
 // Example: enable rounded corners for all windows.
 // (This example rule is commented out with a "/-" in front.)
-/-window-rule {
-    geometry-corner-radius 12
+window-rule {
+    geometry-corner-radius 10
     clip-to-geometry true
 }
 
 debug {
 	honor-xdg-activation-with-invalid-serial
 }
+
+
+layer-rule {
+	match namespace="^noctalia-overview*"
+	place-within-backdrop true
+}
+
+overview {
+	workspace-shadow {
+		off
+	}
+}
+
+
 
 binds {
     // Keys consist of modifiers separated by + signs, followed by an XKB key name
@@ -370,7 +386,11 @@ binds {
 
     // Suggested binds for running programs: terminal, app launcher, screen locker.
     Mod+t hotkey-overlay-title="Open a Terminal: alacritty" { spawn "alacritty"; }
-    Mod+Space hotkey-overlay-title="Run an Application: fuzzel" { spawn "fuzzel"; }
+
+    Mod+Space hotkey-overlay-title="Run an Application: fuzzel" { spawn-sh "qs -c noctalia-shell ipc call launcher toggle"; }
+
+    Mod+S { spawn-sh "qs -c noctalia-shell ip call controlCenter toggle"; }
+
     Super+Alt+L hotkey-overlay-title="Lock the Screen: swaylock" { spawn "swaylock"; }
 
     // Use spawn-sh to run a shell command. Do this if you need pipes, multiple commands, etc.
@@ -598,9 +618,9 @@ binds {
     // Mod+Space       { switch-layout "next"; }
     // Mod+Shift+Space { switch-layout "prev"; }
 
-    Alt+Shift+S { screenshot; }
-    Ctrl+Print { screenshot-screen; }
-    Alt+Print { screenshot-window; }
+    Mod+Shift+S { spawn "screenshot" "region"; }
+    Mod+Print { spawn "screenshot" "monitor"; }
+    Mod+Shift+Print { spawn "screenshot" "window"; }
 
     // Applications such as remote-desktop clients and software KVM switches may
     // request that niri stops processing the keyboard shortcuts defined here
@@ -620,3 +640,6 @@ binds {
     // moving the mouse or pressing any other key.
     Mod+Shift+P { power-off-monitors; }
 }
+
+include "./noctalia.kdl"
+
