@@ -41,21 +41,21 @@ return {
 		config = function()
 			require("conform").setup({
 				formatters_by_ft = {
-					javascript = { "biome", "prettier", "prettierd", stop_after_first = true },
-					javascriptreact = { "biome", "prettier", "prettierd", stop_after_first = true },
-					typescript = { "biome", "prettier", "prettierd", stop_after_first = true },
-					typescriptreact = { "biome", "prettier", "prettierd", stop_after_first = true },
-					json = { "biome", "prettier", "prettierd", stop_after_first = true },
-					html = { "biome", "prettier", "prettierd", stop_after_first = true },
-					css = { "biome", "prettier", "prettierd", stop_after_first = true },
+					javascript = { "prettierd", stop_after_first = true },
+					javascriptreact = { "prettierd", stop_after_first = true },
+					typescript = { "prettierd", stop_after_first = true },
+					typescriptreact = { "prettierd", stop_after_first = true },
+					json = { "prettier", "prettierd", stop_after_first = true },
+					html = { "prettier", "prettierd", stop_after_first = true },
+					css = { "prettier", "prettierd", stop_after_first = true },
 					lua = { "stylua", stop_after_first = true },
 					python = { "ruff_fix", "ruff_format", "ruff_organize_imports" },
 					vue = { "prettier", "prettierd", stop_after_first = true },
 					cs = { "csharpier", stop_after_first = true },
 				},
-				format_after_save = {
-					lsp_format = "fallback",
-				},
+				--format_after_save = {
+				--	lsp_format = "fallback",
+				--},
 				formatters = {
 					csharpier = {
 						command = "dotnet",
@@ -68,6 +68,13 @@ return {
 					},
 				},
 			})
+
+			vim.api.nvim_create_autocmd("BufWritePre", {
+				pattern = "*",
+				callback = function(args)
+					require("conform").format({ bufnr = args.buf })
+				end,
+			})
 		end,
 	},
 
@@ -79,10 +86,10 @@ return {
 			local lint = require("lint")
 			lint.linters_by_ft = {
 				python = { "ruff" },
-				javascript = { "biomejs" },
-				javascriptreact = { "biomejs" },
-				typescript = { "biomejs" },
-				typescriptreact = { "biomejs" },
+				javascript = { "eslint_d" },
+				javascriptreact = { "eslint_d" },
+				typescript = { "eslint_d" },
+				typescriptreact = { "eslint_d" },
 				vue = { "eslint_d" },
 			}
 

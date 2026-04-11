@@ -18,6 +18,8 @@ set $term alacritty
 # Your preferred application launcher
 set $menu fuzzel
 
+exec xwayland-satellite &
+
 include colorscheme
 
 ### Output configuration

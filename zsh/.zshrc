@@ -56,6 +56,14 @@ export PATH="$PATH:$(go env GOBIN):$(go env GOPATH)/bin"
 # proto
 export PATH="$PATH:$HOME/.proto/bin/proto-shim:$HOME/.proto/bin"
 
+# flutter
+export PATH="$HOME/sdks/flutter/bin:$PATH"
+
+# chrome for flutter
+export CHROME_EXECUTABLE=/usr/bin/google-chrome-stable
+
+export DISPLAY=:0
+
 # nvm
 export NVM_DIR="$HOME/.nvm"
 
