@@ -16,11 +16,11 @@ return {
 			"css",
 			"vue",
 			"java",
-			"csharp"
+			"csharp",
 		}
 
 		local installed = require("nvim-treesitter.config").get_installed()
-		local to_install = vim.tbl_filter(function (p)
+		local to_install = vim.tbl_filter(function(p)
 			return not vim.tbl_contains(installed, p)
 		end, ensure_installed)
 
@@ -29,13 +29,10 @@ return {
 		end
 
 		vim.api.nvim_create_autocmd("FileType", {
-			callback = function ()
+			callback = function()
 				pcall(vim.treesitter.start)
 				vim.bo.indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
-				
-			end
+			end,
 		})
-
-
 	end,
 }

@@ -1,106 +1,23 @@
-return {
-	--LSP
-	{
-		"mason-org/mason-lspconfig.nvim",
-		opts = {
-			ensure_installed = {
-				"lua_ls",
-				"pyright",
-				"gopls",
-				"vue_ls",
-				"tailwindcss",
-				"html",
-				"cssls",
-			},
-			automatic_enable = {
-				exclude = {
-					"vtsls",
-					"vue_ls",
-					"lua_ls",
-				},
-			},
-		},
-		dependencies = {
-			{
-				"mason-org/mason.nvim",
-				opts = {
-					registries = {
-						"github:mason-org/mason-registry",
-						"github:Crashdummyy/mason-registry",
-					},
-				},
-			},
-			"neovim/nvim-lspconfig",
-		},
+vim.pack.add({
+	"https://github.com/neovim/nvim-lspconfig",
+	"https://github.com/mason-org/mason.nvim",
+	"https://github.com/mason-org/mason-lspconfig.nvim",
+})
+
+require("mason").setup({
+	registries = {
+		"github:mason-org/mason-registry",
+		"github:Crashdummyy/mason-registry",
 	},
+})
 
-	--Formatter
-	{
-		"stevearc/conform.nvim",
-		event = { "BufReadPre", "BufNewFile" },
-		config = function()
-			require("conform").setup({
-				formatters_by_ft = {
-					javascript = { "prettierd", stop_after_first = true },
-					javascriptreact = { "prettierd", stop_after_first = true },
-					typescript = { "prettierd", stop_after_first = true },
-					typescriptreact = { "prettierd", stop_after_first = true },
-					json = { "prettierd", stop_after_first = true },
-					html = { "prettierd", stop_after_first = true },
-					css = { "prettierd", stop_after_first = true },
-					lua = { "stylua", stop_after_first = true },
-					python = { "ruff_fix", "ruff_format", "ruff_organize_imports", stop_after_first = true },
-					vue = { "prettierd", stop_after_first = true },
-					cs = { "csharpier", stop_after_first = true },
-				},
-				--format_after_save = {
-				--	lsp_format = "fallback",
-				--},
-				formatters = {
-					csharpier = {
-						command = "dotnet",
-						args = {
-							"csharpier",
-							"format",
-							"--write-stdout",
-						},
-						to_stdin = true,
-					},
-				},
-			})
-
-			vim.api.nvim_create_autocmd("BufWritePre", {
-				pattern = "*",
-				callback = function(args)
-					require("conform").format({ bufnr = args.buf })
-				end,
-			})
-		end,
+require("mason-lspconfig").setup({
+	ensure_installed = {
+		"lua_ls",
+		"vtsls",
+		"html",
+		"tailwindcss",
+		"cssls",
+		"jdtls",
 	},
-
-	--Linter
-	{
-		"mfussenegger/nvim-lint",
-		event = { "BufReadPre", "BufNewFile" },
-		config = function()
-			local lint = require("lint")
-			lint.linters_by_ft = {
-				python = { "ruff" },
-				javascript = { "eslint_d" },
-				javascriptreact = { "eslint_d" },
-				typescript = { "eslint_d" },
-				typescriptreact = { "eslint_d" },
-				vue = { "eslint_d" },
-			}
-
-			local lint_augroup = vim.api.nvim_create_augroup("lint", { clear = true })
-
-			vim.api.nvim_create_autocmd({ "BufEnter", "BufWritePost", "TextChanged" }, {
-				group = lint_augroup,
-				callback = function()
-					lint.try_lint()
-				end,
-			})
-		end,
-	},
-}
+})
