@@ -1,13 +1,3 @@
-local hooks = function(ev)
-	local name, kind = ev.data.spec.name, ev.data.kind
-
-	if name == "blink.cmp" and (kind == "install" or kind == "update") then
-		vim.system({ "cargo", "build", "--release" }, { cwd = ev.data.path }):wait()
-	end
-end
-
-vim.api.nvim_create_autocmd("PackChanged", { callback = hooks })
-
 vim.pack.add({ "https://github.com/saghen/blink.cmp" })
 
 require("blink.cmp").setup({
@@ -26,12 +16,12 @@ require("blink.cmp").setup({
 
 	sources = {
 		default = { "lsp", "path" },
-		per_filetype = {
-			sql = { "dadbod", "buffer" },
-		},
-		providers = {
-			dadbod = { name = "Dabbod", module = "vim_dadbod_completion.blink" },
-		},
+		--per_filetype = {
+		--	sql = { "dadbod", "buffer" },
+		--},
+		--providers = {
+		--	dadbod = { name = "Dabbod", module = "vim_dadbod_completion.blink" },
+		--},
 	},
 
 	fuzzy = {

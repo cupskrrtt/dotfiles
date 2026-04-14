@@ -1,6 +1,6 @@
 local keymap = vim.keymap
 
-keymap.set("n", "<leader>fb", "<cmd>Telescope file_browser<CR>")
+keymap.set("n", "<leader>fb", "<cmd>Explore <CR>")
 keymap.set("n", "<leader>ff", "<cmd>Telescope find_files<CR>")
 keymap.set("n", "<leader>fg", "<cmd>Telescope live_grep<CR>")
 
@@ -15,7 +15,6 @@ keymap.set("n", "sk", "<C-w>k")
 keymap.set("n", "sl", "<C-w>l")
 keymap.set("n", "<C-h>", ":bp<CR>")
 keymap.set("n", "<C-l>", ":bn<CR>")
-keymap.set("n", "<C-w>", ":BD<CR>")
 
 keymap.set("n", "<leader>dh", ":lua vim.lsp.buf.hover()<CR>")
 keymap.set("n", "<leader>do", ":lua vim.diagnostic.open_float()<CR>")
