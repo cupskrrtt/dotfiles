@@ -11,6 +11,7 @@ export GTK_USE_PORTAL=1
 # Cleanly prepend paths (ensures no duplicates)
 typeset -U path
 path=(
+	"$HOME/.dotnet"
 	"$HOME/.local/bin"
   "$PNPM_HOME"
   "$GOPATH/bin"
