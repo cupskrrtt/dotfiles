@@ -11,6 +11,8 @@ require("conform").setup({
 		css = { "prettierd" },
 		lua = { "stylua" },
 		cs = { "csharpier" },
+		go = { "gofumpt" },
+		python = { "ruff_format", "ruff_organize_imports" },
 	},
 })
 

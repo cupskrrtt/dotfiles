@@ -31,6 +31,11 @@ general = "Alacritty"
 instance = "Alacritty"
 
 [general]
+import = ["~/.config/alacritty/themes/noctalia.toml"]
 live_config_reload = true
 
-import = ["~/.config/alacritty/themes/noctalia.toml"]
+
+[[keyboard.bindings]]
+key = "Return"
+mods = "Shift"
+chars = "\u001B\r"

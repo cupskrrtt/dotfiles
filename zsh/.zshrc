@@ -1,3 +1,8 @@
+#=====#
+# ENV #
+#=====#
+export EDITOR=nvim
+
 #=======#
 # PATHS #
 #=======#
@@ -7,6 +12,7 @@ export GOPATH="$HOME/go"
 export PNPM_HOME="$HOME/.local/share/pnpm"
 export NVM_DIR="$HOME/.nvm"
 export GTK_USE_PORTAL=1
+export DOTNET_ROOT="$HOME/.dotnet"
 
 # Cleanly prepend paths (ensures no duplicates)
 typeset -U path
@@ -17,13 +23,14 @@ path=(
   "$GOPATH/bin"
   "$(go env GOBIN 2>/dev/null)"
   "$path[@]"
+	"$HOME/.cargo/bin"
 )
 
 #=======#
 # ALIAS #
 #=======#
 
-alias ls="eza --long --header --all --icons"
+alias ls="eza --long --header --all"
 
 #==========#
 # AUTOLOAD #

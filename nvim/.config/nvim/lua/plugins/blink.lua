@@ -1,6 +1,10 @@
-vim.pack.add({ "https://github.com/saghen/blink.cmp" })
+vim.pack.add({ "https://github.com/saghen/blink.cmp", "https://github.com/rafamadriz/friendly-snippets", "https://github.com/saghen/blink.lib" })
 
-require("blink.cmp").setup({
+local cmp = require("blink.cmp")
+
+cmp.build():pwait()
+
+cmp.setup({
 	keymap = {
 		preset = "none",
 		["<C-k>"] = { "select_prev", "fallback" },

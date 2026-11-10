@@ -2,9 +2,11 @@ vim.pack.add({
 	"https://github.com/mfussenegger/nvim-dap",
 	"https://github.com/nvim-neotest/nvim-nio",
 	"https://github.com/rcarriga/nvim-dap-ui",
+	"https://github.com/leoluz/nvim-dap-go",
 })
 
 local dap, dapui = require("dap"), require("dapui")
+require("dap-go").setup()
 
 dapui.setup({
 	controls = {
