@@ -18,13 +18,12 @@ M.config = {
   dir = "down", -- where the output pane opens next to this nvim: "down" or "right"
   size = 30, -- its share of the split, in percent
   focus = false, -- move the focus to it
-  close_on_end = false, -- close the output pane when the session ends (otherwise it stays until the next run)
+  close_on_end = true, -- close the output pane with the panels when the session ends, and put the tab's layout back
   categories = { stdout = true, stderr = true, console = false }, -- DAP output categories to show
   -- Panel panes opened with a session; {} for none. repl and watches go in a
   -- row beside the output pane; variables, stack and breakpoints in a column
   -- right of nvim, in the order given.
   panels = { "repl", "watches", "variables", "stack", "breakpoints" },
-  close_panels_on_end = true, -- close the panels when the session ends
   column_size = 30, -- the column's width, in percent
 }
 
@@ -47,18 +46,23 @@ end
 -- The panels start from start.lua, next to this file.
 local start_file = vim.fn.fnamemodify(debug.getinfo(1, "S").source:sub(2), ":p:h") .. "/start.lua"
 
-local function hiero(args, on_ok)
+--- Run `hiero pane <args>`. `on_ok` gets its output; `on_fail` (if given) runs
+--- when it failed, after the warning.
+local function hiero(args, on_ok, on_fail)
   local argv = vim.list_extend({ M.config.cmd, "pane" }, args)
   vim.system(argv, { text = true }, function(r)
-    if r.code ~= 0 then
-      vim.schedule(function()
-        vim.notify("hiero pane: " .. vim.trim(r.stderr or ""), vim.log.levels.WARN)
-      end)
-    elseif on_ok then
-      vim.schedule(function()
+    vim.schedule(function()
+      if r.code ~= 0 then
+        -- One line: a longer message would stop nvim at a "Press ENTER" prompt.
+        local first = vim.trim(r.stderr or ""):match("[^\n]+") or ("exit " .. r.code)
+        vim.notify("hiero pane: " .. first, vim.log.levels.WARN)
+        if on_fail then
+          on_fail()
+        end
+      elseif on_ok then
         on_ok(vim.trim(r.stdout or ""))
-      end)
-    end
+      end
+    end)
   end)
 end
 
@@ -365,10 +369,7 @@ end
 
 --- repl and watches sit beside the output pane (`beside`), sharing its row;
 --- variables, stack and breakpoints share a column right of nvim.
-local panels_open = false
-
 local function open_panels(beside)
-  panels_open = true
   local row, column = {}, {}
   for _, kind in ipairs(M.config.panels) do
     table.insert(ROW[kind] and row or column, kind)
@@ -385,43 +386,23 @@ local function open_panels(beside)
   end, "down", 0)
 end
 
-local function close_panels()
-  panels_open = false
-  for _, kind in ipairs(M.config.panels) do
-    hiero({ "close", "--name", pane_name(kind) })
-  end
-end
-
---- Open the panels, or close them when they are open (for a key like <F7>).
-function M.toggle_panels()
-  if not own_pane() then
-    return
-  end
-  if panels_open then
-    close_panels()
-  else
-    open_panels(state.pane)
-  end
-end
-
 -- Output ---------------------------------------------------------------------
 
---- Start a fresh output file and open (or restart) the pane that follows it.
---- `then_` gets the pane's id.
-function M.open(title, then_)
-  if not own_pane() then
-    return
+--- Start a fresh output file (or, with `keep`, go on with the one there is)
+--- and open (or restart) the pane that follows it. `then_` gets the pane's id.
+local function open_output(title, then_, keep)
+  if not (keep and state.file) then
+    if state.file then
+      state.file:close()
+    end
+    state.path = log_path()
+    state.file = io.open(state.path, "w")
+    if not state.file then
+      vim.notify("hiero.dap: can't write " .. state.path, vim.log.levels.WARN)
+      return
+    end
+    write(("\27[2m── %s · %s ──\27[0m\n"):format(title or "debug", os.date("%H:%M:%S")))
   end
-  if state.file then
-    state.file:close()
-  end
-  state.path = log_path()
-  state.file = io.open(state.path, "w")
-  if not state.file then
-    vim.notify("hiero.dap: can't write " .. state.path, vim.log.levels.WARN)
-    return
-  end
-  write(("\27[2m── %s · %s ──\27[0m\n"):format(title or "debug", os.date("%H:%M:%S")))
   local args = { "split", "--reuse", "--name", pane_name("output"), "--dir", M.config.dir }
   if M.config.size then
     vim.list_extend(args, { "--size", tostring(M.config.size) })
@@ -438,12 +419,66 @@ function M.open(title, then_)
   end)
 end
 
---- Close the output pane.
-function M.close()
-  if own_pane() then
-    hiero({ "close", "--name", pane_name("output") })
+-- The debug panes (output and panels) are open, and the layout of the tab
+-- from before they opened, to put back when they close.
+state.open = false
+state.saved = nil
+
+--- Open the output pane and the panels. The tab's layout is saved first (once:
+--- not when they are already open, e.g. the next session), so closing them
+--- puts it back exactly.
+local function open_all(title, keep)
+  local function go()
+    open_output(title, open_panels, keep)
   end
-  state.pane = nil
+  if state.open then
+    return go()
+  end
+  state.open = true
+  hiero({ "layout" }, function(json)
+    state.saved = json
+    go()
+  end, go)
+end
+
+--- Close the output pane and the panels in one go, then put back the layout.
+--- If you changed the tab meanwhile (another split, a closed pane), it stays as it is.
+local function close_all()
+  state.open, state.pane = false, nil
+  local args = { "close", "--missing-ok", "--name", pane_name("output") }
+  for _, kind in ipairs(M.config.panels) do
+    vim.list_extend(args, { "--name", pane_name(kind) })
+  end
+  local saved = state.saved
+  state.saved = nil
+  hiero(args, function()
+    if saved and saved ~= "" then
+      hiero({ "layout", "--restore", saved })
+    end
+  end)
+end
+
+--- Open the output pane and the panels, or close them when they are open (for a key like <F7>).
+function M.toggle_panels()
+  if not own_pane() then
+    return
+  end
+  if state.open then
+    close_all()
+  else
+    open_all("debug", true)
+  end
+end
+
+M.open = function(title)
+  if own_pane() then
+    open_all(title, false)
+  end
+end
+M.close = function()
+  if own_pane() and state.open then
+    close_all()
+  end
 end
 
 local function on_output(_, body)
@@ -475,10 +510,7 @@ local function on_end(_, body)
   write(("\27[2m── %s ──\27[0m\n"):format(text))
   broadcast("on_event", text)
   if M.config.close_on_end then
-    M.close()
-  end
-  if M.config.close_panels_on_end then
-    close_panels()
+    close_all()
   end
 end
 
@@ -490,9 +522,7 @@ function M.setup(opts)
   local dap = require("dap")
   local function start(session)
     ended = false
-    M.open(session and session.config and session.config.name, function(out)
-      open_panels(out)
-    end)
+    open_all(session and session.config and session.config.name, false)
   end
   dap.listeners.before.launch.hiero = start
   dap.listeners.before.attach.hiero = start
@@ -532,14 +562,11 @@ function M.setup(opts)
       send_bps()
     end
   end))
-  vim.api.nvim_create_user_command("HieroDapOutput", function()
-    M.open("output")
-  end, { desc = "Open the Hiero pane for debug output" })
-  vim.api.nvim_create_user_command("HieroDapOutputClose", M.close, { desc = "Close the Hiero debug output pane" })
-  vim.api.nvim_create_user_command("HieroDapPanels", function()
-    open_panels(state.pane)
-  end, { desc = "Open the Hiero debug panels" })
-  vim.api.nvim_create_user_command("HieroDapPanelsClose", close_panels, { desc = "Close the Hiero debug panels" })
+  vim.api.nvim_create_user_command("HieroDap", function()
+    open_all("debug", true)
+  end, { desc = "Open the Hiero debug panes (output and panels)" })
+  vim.api.nvim_create_user_command("HieroDapClose", M.close, { desc = "Close the Hiero debug panes and put the layout back" })
+  vim.api.nvim_create_user_command("HieroDapToggle", M.toggle_panels, { desc = "Open or close the Hiero debug panes" })
 end
 
 return M
