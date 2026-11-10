@@ -19,6 +19,7 @@ M.config = {
   size = 30, -- its share of the split, in percent
   focus = false, -- move the focus to it
   close_on_end = true, -- close the output pane with the panels when the session ends, and put the tab's layout back
+  hide_others = true, -- while debugging, take the tab's other panes away (their programs keep running)
   categories = { stdout = true, stderr = true, console = false }, -- DAP output categories to show
   -- Panel panes opened with a session; {} for none. repl and watches go in a
   -- row beside the output pane; variables, stack and breakpoints in a column
@@ -41,6 +42,20 @@ end
 
 local function log_path()
   return vim.fn.stdpath("run") .. "/hiero-dap-" .. own_pane() .. ".log"
+end
+
+-- The tab's layout from before a session, also on disk: if this nvim dies
+-- mid-session, the next one in the pane puts it back.
+local function layout_path()
+  return vim.fn.stdpath("run") .. "/hiero-dap-" .. own_pane() .. ".layout"
+end
+
+local function write_file(path, text)
+  local f = io.open(path, "w")
+  if f then
+    f:write(text)
+    f:close()
+  end
 end
 
 -- The panels start from start.lua, next to this file.
@@ -352,27 +367,38 @@ local ROW = { repl = true, watches = true }
 --- joins the same split, and `--size` is the new pane's share of that split.
 --- So the n-th pane of the split takes 1/n and they all end up the same size.
 --- `first` places the first one; `before` panes are already in its split.
-local function chain(kinds, first, dir, before)
+local function chain(kinds, first, dir, before, done)
   local function step(i, prev)
     local kind = kinds[i]
     if not kind then
-      return
+      return done()
     end
     local where = prev and { "--pane", prev, "--dir", dir, "--size", tostring(math.floor(100 / (before + i))) }
       or first()
     hiero(panel_args(kind, where), function(id)
       step(i + 1, id)
+    end, function()
+      -- One failed (warned already): go on with the rest from the same place.
+      step(i + 1, prev)
     end)
   end
   step(1, nil)
 end
 
 --- repl and watches sit beside the output pane (`beside`), sharing its row;
---- variables, stack and breakpoints share a column right of nvim.
-local function open_panels(beside)
+--- variables, stack and breakpoints share a column right of nvim. `done` runs
+--- once both are open.
+local function open_panels(beside, done)
   local row, column = {}, {}
   for _, kind in ipairs(M.config.panels) do
     table.insert(ROW[kind] and row or column, kind)
+  end
+  local left = 2
+  local function one_done()
+    left = left - 1
+    if left == 0 and done then
+      done()
+    end
   end
   -- The row joins the output pane's split (or starts one under nvim).
   chain(row, function()
@@ -380,10 +406,10 @@ local function open_panels(beside)
       return { "--pane", beside, "--dir", "right", "--size", "50" }
     end
     return { "--dir", M.config.dir, "--size", tostring(M.config.size or 30) }
-  end, "right", beside and 1 or 0)
+  end, "right", beside and 1 or 0, one_done)
   chain(column, function()
     return { "--dir", "right", "--size", tostring(M.config.column_size) }
-  end, "down", 0)
+  end, "down", 0, one_done)
 end
 
 -- Output ---------------------------------------------------------------------
@@ -416,6 +442,10 @@ local function open_output(title, then_, keep)
     if then_ then
       then_(id)
     end
+  end, function()
+    if then_ then
+      then_(nil)
+    end
   end)
 end
 
@@ -427,9 +457,25 @@ state.saved = nil
 --- Open the output pane and the panels. The tab's layout is saved first (once:
 --- not when they are already open, e.g. the next session), so closing them
 --- puts it back exactly.
+local close_all -- below
+
+--- Open the output pane and the panels. The tab's layout is saved first (once:
+--- not when they are already open, e.g. the next session), so closing them
+--- puts it back exactly. Opening takes a moment (one pane after the other); a
+--- close asked for meanwhile (a program that ends at once) waits for it.
 local function open_all(title, keep)
+  state.opening = (state.opening or 0) + 1
+  local function finished()
+    state.opening = state.opening - 1
+    if state.opening == 0 and state.close_pending then
+      state.close_pending = false
+      close_all()
+    end
+  end
   local function go()
-    open_output(title, open_panels, keep)
+    open_output(title, function(out)
+      open_panels(out, finished)
+    end, keep)
   end
   if state.open then
     return go()
@@ -437,23 +483,79 @@ local function open_all(title, keep)
   state.open = true
   hiero({ "layout" }, function(json)
     state.saved = json
-    go()
+    write_file(layout_path(), json)
+    if M.config.hide_others then
+      -- Only once the layout is saved: it is what brings them back.
+      hiero({ "hide-others" }, go, go)
+    else
+      go()
+    end
   end, go)
 end
 
---- Close the output pane and the panels in one go, then put back the layout.
---- If you changed the tab meanwhile (another split, a closed pane), it stays as it is.
-local function close_all()
-  state.open, state.pane = false, nil
+--- Close the output pane and the panels in one go, then put back the layout,
+--- with the panes that were hidden. Panes you added meanwhile stay, beside it.
+local function close_args()
   local args = { "close", "--missing-ok", "--name", pane_name("output") }
   for _, kind in ipairs(M.config.panels) do
     vim.list_extend(args, { "--name", pane_name(kind) })
   end
+  return args
+end
+
+--- `sync`: wait for it (nvim is about to exit).
+close_all = function(sync)
+  if not sync and (state.opening or 0) > 0 then
+    state.close_pending = true
+    return
+  end
+  state.open, state.pane = false, nil
   local saved = state.saved
   state.saved = nil
-  hiero(args, function()
+  os.remove(layout_path())
+  if sync then
+    local run = function(args)
+      pcall(function()
+        vim.system(vim.list_extend({ M.config.cmd, "pane" }, args)):wait(5000)
+      end)
+    end
+    run(close_args())
     if saved and saved ~= "" then
-      hiero({ "layout", "--restore", saved })
+      run({ "layout", "--restore", saved })
+    end
+    return
+  end
+  -- Until the layout is back, nvim exiting (which ends the session and so
+  -- starts this) must still finish it: see VimLeavePre.
+  state.restoring = saved
+  hiero(close_args(), function()
+    if saved and saved ~= "" then
+      hiero({ "layout", "--restore", saved }, function()
+        state.restoring = nil
+      end)
+    else
+      state.restoring = nil
+    end
+  end)
+end
+
+--- A session this pane's nvim left behind (it died mid-session): close its
+--- panes and put the layout back, or at least bring hidden panes back.
+local function recover()
+  local f = io.open(layout_path(), "r")
+  if not f then
+    return -- the usual case: nothing left behind
+  end
+  local saved = f:read("*a")
+  f:close()
+  os.remove(layout_path())
+  hiero(close_args(), function()
+    if saved and saved ~= "" then
+      hiero({ "layout", "--restore", saved }, function()
+        hiero({ "unhide", "--mine" })
+      end)
+    else
+      hiero({ "unhide", "--mine" })
     end
   end)
 end
@@ -519,9 +621,25 @@ function M.setup(opts)
   if not own_pane() then
     return
   end
+  recover()
+  vim.api.nvim_create_autocmd("VimLeavePre", {
+    group = vim.api.nvim_create_augroup("hiero_dap", { clear = true }),
+    callback = function()
+      if state.open then
+        close_all(true)
+      elseif state.restoring then
+        -- A close started in the background (the session ended as nvim
+        -- quits): finish it now, before nvim is gone.
+        state.open, state.saved = true, state.restoring
+        state.restoring = nil
+        close_all(true)
+      end
+    end,
+  })
   local dap = require("dap")
   local function start(session)
     ended = false
+    state.close_pending = false
     open_all(session and session.config and session.config.name, false)
   end
   dap.listeners.before.launch.hiero = start
@@ -529,6 +647,13 @@ function M.setup(opts)
   dap.listeners.after.event_output.hiero = on_output
   dap.listeners.after.event_exited.hiero = on_end
   dap.listeners.after.event_terminated.hiero = on_end
+  -- An adapter doesn't always send `terminated` (delve after a terminate
+  -- request, sometimes); nvim-dap dropping its last session always counts.
+  dap.listeners.on_session.hiero = function(old, new)
+    if old and not new then
+      on_end(old, nil)
+    end
+  end
   dap.listeners.after.event_stopped.hiero = function(_, body)
     stop_pending = body.reason or "stopped"
   end
