@@ -5,26 +5,39 @@ vim.pack.add({
 	"https://github.com/leoluz/nvim-dap-go",
 })
 
-local dap, dapui = require("dap"), require("dapui")
+local dap = require("dap")
 require("dap-go").setup()
 
-dapui.setup({
-	controls = {
-		enabled = false,
-	},
-})
+-- Inside Hiero, the debug views are Hiero panes (output, repl, watches,
+-- variables, stack, breakpoints); outside it, dap-ui shows them in nvim.
+local in_hiero = (vim.env.HIERO_PANE or "") ~= ""
+local toggle_ui
 
-dap.listeners.before.attach.dapui_config = function()
-	dapui.open()
-end
-dap.listeners.before.launch.dapui_config = function()
-	dapui.open()
-end
-dap.listeners.before.event_terminated.dapui_config = function()
-	dapui.close()
-end
-dap.listeners.before.event_exited.dapui_config = function()
-	dapui.close()
+if in_hiero then
+	vim.opt.rtp:append(vim.fn.expand("~/project/hiero/nvim"))
+	local hiero = require("hiero.dap")
+	hiero.setup({ dir = "down", size = 30 })
+	toggle_ui = hiero.toggle_panels
+else
+	local dapui = require("dapui")
+	dapui.setup({
+		controls = {
+			enabled = false,
+		},
+	})
+	dap.listeners.before.attach.dapui_config = function()
+		dapui.open()
+	end
+	dap.listeners.before.launch.dapui_config = function()
+		dapui.open()
+	end
+	dap.listeners.before.event_terminated.dapui_config = function()
+		dapui.close()
+	end
+	dap.listeners.before.event_exited.dapui_config = function()
+		dapui.close()
+	end
+	toggle_ui = dapui.toggle
 end
 
 --Keymaps
@@ -59,7 +72,7 @@ local map = vim.keymap.set
 
 map("n", "<F4>", dap.terminate)
 map("n", "<F5>", dap.continue)
-map("n", "<F7>", dapui.toggle)
+map("n", "<F7>", toggle_ui)
 map("n", "<F9>", dap.toggle_breakpoint)
 map("n", "<F10>", dap.step_into)
 map("n", "<F11>", dap.step_over)
