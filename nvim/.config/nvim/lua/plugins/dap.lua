@@ -14,7 +14,7 @@ local in_hiero = (vim.env.HIERO_PANE or "") ~= ""
 local toggle_ui
 
 if in_hiero then
-	vim.opt.rtp:append(vim.fn.expand("~/project/hiero/nvim"))
+	-- lua/hiero is a copy of hiero's nvim/lua/hiero (github.com/cupskrrtt/hiero).
 	local hiero = require("hiero.dap")
 	hiero.setup({ dir = "down", size = 30 })
 	toggle_ui = hiero.toggle_panels
