@@ -125,7 +125,7 @@ local function err_text(err)
   return fmt or err.message or vim.inspect(err)
 end
 
-local send_frame -- below
+local send_frame, send_watches, send_bps -- below
 
 --- From a panel: it listens at `addr`. Connect back so we can tell it things.
 function M._subscribe(kind, addr)
@@ -233,7 +233,7 @@ end
 -- re-evaluated on every stop and frame change.
 local watches = {}
 
-local function send_watches(addr)
+send_watches = function(addr)
   local s = require("dap").session()
   local results = {}
   local function done()
@@ -310,7 +310,7 @@ end
 
 local last_bps = nil
 
-local function send_bps(addr)
+send_bps = function(addr)
   local list = bp_list()
   local key = vim.inspect(list)
   if addr then
@@ -503,6 +503,22 @@ local function close_args()
   return args
 end
 
+--- Close the output file now and return what removes it from disk: that waits
+--- until the pane that follows it is closed. (The file lives in stdpath("run"),
+--- normally RAM.) A file a later `open_output` has started again is left alone.
+local function release_log()
+  local path = state.path
+  if state.file then
+    state.file:close()
+    state.file = nil
+  end
+  return function()
+    if path and not state.file then
+      os.remove(path)
+    end
+  end
+end
+
 --- `sync`: wait for it (nvim is about to exit).
 close_all = function(sync)
   if not sync and (state.opening or 0) > 0 then
@@ -513,6 +529,7 @@ close_all = function(sync)
   local saved = state.saved
   state.saved = nil
   os.remove(layout_path())
+  local remove_log = release_log()
   if sync then
     local run = function(args)
       pcall(function()
@@ -520,6 +537,7 @@ close_all = function(sync)
       end)
     end
     run(close_args())
+    remove_log()
     if saved and saved ~= "" then
       run({ "layout", "--restore", saved })
     end
@@ -529,6 +547,7 @@ close_all = function(sync)
   -- starts this) must still finish it: see VimLeavePre.
   state.restoring = saved
   hiero(close_args(), function()
+    remove_log()
     if saved and saved ~= "" then
       hiero({ "layout", "--restore", saved }, function()
         state.restoring = nil
@@ -536,7 +555,7 @@ close_all = function(sync)
     else
       state.restoring = nil
     end
-  end)
+  end, remove_log)
 end
 
 --- A session this pane's nvim left behind (it died mid-session): close its
@@ -600,6 +619,7 @@ end
 -- Session --------------------------------------------------------------------
 
 local ended = false
+local timer = nil -- the breakpoint timer (one, however often setup runs)
 local stop_pending = nil -- the reason of a stop whose location isn't known yet
 
 local function on_end(_, body)
@@ -682,7 +702,12 @@ function M.setup(opts)
     dap.listeners.after[req].hiero = running
   end
   dap.listeners.after.event_continued.hiero = running
-  vim.uv.new_timer():start(1000, 1000, vim.schedule_wrap(function()
+  if timer then
+    timer:stop()
+    timer:close()
+  end
+  timer = vim.uv.new_timer()
+  timer:start(1000, 1000, vim.schedule_wrap(function()
     if next(subs) then
       send_bps()
     end

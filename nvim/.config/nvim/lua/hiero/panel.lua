@@ -69,6 +69,8 @@ end
 -- REPL -----------------------------------------------------------------------
 
 local repl = { history = {}, hist_i = nil }
+local MAX_HISTORY = 500 -- typed lines kept for <Up>
+local MAX_LINES = 3000 -- the buffer keeps this many lines; older ones go from the top
 
 --- Add lines above the prompt, highlighted with `hl`, the last one with a dim `note` after it.
 local function append(text, hl, note)
@@ -86,6 +88,11 @@ local function append(text, hl, note)
   end
   if note then
     vim.api.nvim_buf_set_extmark(buf, ns, at + #lines - 1, 0, { virt_text = { { "  " .. note, "Comment" } } })
+  end
+  -- Drop the oldest lines (never the prompt, the last one); their extmarks go with them.
+  local over = vim.api.nvim_buf_line_count(buf) - MAX_LINES
+  if over > 0 then
+    vim.api.nvim_buf_set_lines(buf, 0, over, false, {})
   end
   -- Keep the prompt line in view in every window showing it.
   for _, w in ipairs(vim.fn.win_findbuf(buf)) do
@@ -132,6 +139,9 @@ function repl.start()
     end
     if repl.history[#repl.history] ~= text then
       table.insert(repl.history, text)
+      if #repl.history > MAX_HISTORY then
+        table.remove(repl.history, 1)
+      end
     end
     repl.hist_i = nil
     if not call("_eval", vim.v.servername, text) then
