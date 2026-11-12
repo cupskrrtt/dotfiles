@@ -1,4 +1,8 @@
-vim.pack.add({ "https://github.com/saghen/blink.cmp", "https://github.com/rafamadriz/friendly-snippets", "https://github.com/saghen/blink.lib" })
+vim.pack.add({
+	"https://github.com/saghen/blink.cmp",
+	"https://github.com/rafamadriz/friendly-snippets",
+	"https://github.com/saghen/blink.lib",
+})
 
 local cmp = require("blink.cmp")
 
@@ -20,12 +24,6 @@ cmp.setup({
 
 	sources = {
 		default = { "lsp", "path" },
-		--per_filetype = {
-		--	sql = { "dadbod", "buffer" },
-		--},
-		--providers = {
-		--	dadbod = { name = "Dabbod", module = "vim_dadbod_completion.blink" },
-		--},
 	},
 
 	fuzzy = {

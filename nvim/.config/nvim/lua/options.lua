@@ -1,6 +1,5 @@
 -- Encoding
 vim.scriptencoding = "utf-8"
-vim.opt.encoding = "utf-8"
 vim.opt.fileencoding = "utf-8"
 
 -- UI
@@ -23,20 +22,16 @@ vim.opt.background = "dark"
 
 -- Indentation
 vim.opt.expandtab = false
-vim.opt.smarttab = true
-vim.opt.autoindent = true
 vim.opt.smartindent = true
 vim.opt.breakindent = true
 vim.opt.shiftwidth = 2
 vim.opt.tabstop = 2
 vim.opt.softtabstop = 2
-vim.opt.backspace = { "start", "eol", "indent" }
 
 -- File and Backup
 vim.opt.backup = false
 vim.opt.writebackup = false
 vim.opt.swapfile = false
-vim.opt.hidden = true
 vim.opt.undofile = true
 
 -- Search
@@ -52,7 +47,7 @@ vim.opt.shell = "zsh"
 
 -- Leader
 vim.g.mapleader = " "
-vim.g.maplocalleader = " " -- ADD: good practice to set both
+vim.g.maplocalleader = " "
 
 -- File navigation
 vim.opt.path:append({ "**" })
@@ -61,7 +56,7 @@ vim.opt.wildignore:append({ "*/node_modules/*" })
 -- Clipboard
 vim.opt.clipboard:append({ "unnamedplus" })
 
--- Splits (ADD: more natural split behavior)
+-- Splits
 vim.opt.splitright = true
 vim.opt.splitbelow = true
 

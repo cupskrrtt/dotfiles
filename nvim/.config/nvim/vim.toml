@@ -1,0 +1,10 @@
+# Selene std for Neovim config: Lua 5.1 + a permissive `vim` global.
+[selene]
+base = "lua51"
+name = "vim"
+
+[vim]
+any = true
+
+[jit]
+any = true

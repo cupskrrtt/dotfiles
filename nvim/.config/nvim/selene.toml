@@ -1,1 +1,1 @@
-std = "vim+neovim"
+std = "vim"

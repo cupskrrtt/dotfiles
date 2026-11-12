@@ -1,17 +1,15 @@
 return {
 	settings = {
 		Lua = {
-			diagnostics = {
-				globals = { "vim" },
-			},
 			runtime = {
 				version = "LuaJIT",
 			},
 			workspace = {
-				library = vim.list_extend(
-					vim.api.nvim_get_runtime_file("", true),
-					{ vim.fn.stdpath("data") .. "/site/pack/core/opt" }
-				),
+				-- Only Neovim's runtime + luv types; scanning every plugin made startup slow.
+				library = {
+					vim.env.VIMRUNTIME,
+					"${3rd}/luv/library",
+				},
 				checkThirdParty = false,
 			},
 		},

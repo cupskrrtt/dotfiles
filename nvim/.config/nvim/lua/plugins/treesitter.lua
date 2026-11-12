@@ -27,8 +27,8 @@ if #to_install > 0 then
 end
 
 vim.api.nvim_create_autocmd("FileType", {
-	pattern = { "<filetype>" },
-	callback = function()
-		vim.treesitter.start()
+	callback = function(ev)
+		-- pcall: filetypes without an installed parser just keep regex highlighting
+		pcall(vim.treesitter.start, ev.buf)
 	end,
 })

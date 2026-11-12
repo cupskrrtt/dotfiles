@@ -3,6 +3,7 @@ vim.pack.add({
 	"https://github.com/nvim-neotest/nvim-nio",
 	"https://github.com/rcarriga/nvim-dap-ui",
 	"https://github.com/leoluz/nvim-dap-go",
+	"https://github.com/jay-babu/mason-nvim-dap.nvim",
 })
 
 local dap = require("dap")
@@ -40,33 +41,32 @@ else
 	toggle_ui = dapui.toggle
 end
 
---Keymaps
-dap.adapters.coreclr = {
-	type = "executable",
-	command = vim.fn.stdpath("data") .. "/mason/bin/netcoredbg",
-	args = { "--interpreter=vscode" },
-}
+-- Debuggers: mason-nvim-dap installs them and registers each adapter plus a
+-- default launch config. To debug a new language, add its name here (or
+-- :MasonInstall it); see :h mason-nvim-dap for the names.
+local mason_dap = require("mason-nvim-dap")
+mason_dap.setup({
+	ensure_installed = { "coreclr", "delve" },
+	-- Debuggers without an entry here use mason-nvim-dap's built-in defaults.
+	handlers = {
+		-- C#: F5 picks a launchSettings.json profile, stops a running instance,
+		-- builds just that project, then launches (see lua/dotnet_debug.lua).
+		coreclr = function(config)
+			local dotnet = require("dotnet_debug")
+			config.configurations = {} -- provided per buffer by dotnet_debug
+			config.adapters = vim.tbl_extend("force", config.adapters, { enrich_config = dotnet.enrich })
+			mason_dap.default_setup(config)
+			dotnet.setup()
+		end,
 
-dap.configurations.cs = {
-	{
-		type = "coreclr",
-		name = "Launch",
-		request = "launch",
-		program = function()
-			local project = vim.fn.getcwd()
-			vim.fn.system("dotnet build " .. project)
-			-- get only the first dll matching the project name
-			local dlls = vim.fn.globpath(project .. "/bin/Debug", "**/*.dll", false, true)
-			-- filter to find the main project dll (not dependencies)
-			for _, dll in ipairs(dlls) do
-				local name = vim.fn.fnamemodify(dll, ":t")
-				if not name:match("^Microsoft") and not name:match("^System") then
-					return dll
-				end
-			end
+		-- Go: dap-go already provides the launch configs (incl. debug test);
+		-- only register the adapter so the menu has no duplicates.
+		delve = function(config)
+			config.configurations = {}
+			mason_dap.default_setup(config)
 		end,
 	},
-}
+})
 
 local map = vim.keymap.set
 
@@ -74,6 +74,6 @@ map("n", "<F4>", dap.terminate)
 map("n", "<F5>", dap.continue)
 map("n", "<F7>", toggle_ui)
 map("n", "<F9>", dap.toggle_breakpoint)
-map("n", "<F10>", dap.step_into)
-map("n", "<F11>", dap.step_over)
+map("n", "<F10>", dap.step_over)
+map("n", "<F11>", dap.step_into)
 map("n", "<F12>", dap.step_out)
