@@ -1,0 +1,44 @@
+<?xml version="1.0" ?>
+<labwc_config>
+  <theme>
+    <name>noctalia</name>
+  </theme>
+  <placement>
+    <policy>center</policy>
+  </placement>
+  <windowRule identifier="*">
+    <action name="Center" />
+  </windowRule>
+	<outputs>
+	  <output>
+	    <name>HDMI-A-1</name>   <!-- your display name -->
+	    <refreshRate>75</refreshRate>
+	  </output>
+	</outputs>
+	<core>
+	    <monitor>
+	        <vrr>adaptive</vrr>
+	    </monitor>
+	</core>
+  <keyboard>
+    <default />
+    <keybind key="W-d">
+      <action name="Execute" command="sakura" />
+    </keybind>
+    <keybind key="A-t">
+      <action name="Execute" command="alacritty" />
+    </keybind>
+    <keybind key="A-space">
+      <action name="Execute" command="noctalia msg panel-toggle launcher" />
+    </keybind>
+		<keybind key="Super+F">
+		  <action name="ToggleFullscreen"/>
+		</keybind>
+    <keybind key="A-l">
+      <action name="Execute" command="noctalia msg session lock" />
+    </keybind>
+    <keybind key="A-S-s">
+      <action name="Execute" command="noctalia msg screenshot-region" />
+    </keybind>
+  </keyboard>
+</labwc_config>

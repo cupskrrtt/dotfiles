@@ -1,0 +1,97 @@
+[bar.default]
+center = [ "workspaces" ]
+end = [ "clock", "volume", "tray", "privacy", "session" ]
+font_family = "JetBrainsMonoNL NF"
+margin_ends = 0
+start = [ "cpu", "ram", "network_rx", "network_tx" ]
+widget_spacing = 13
+
+[config]
+
+[dock]
+auto_hide = true
+enabled = true
+reserve_space = false
+show_dots = true
+
+[lockscreen_widgets]
+enabled = false
+schema_version = 2
+widget_order = [ "lockscreen-login-box@WL-1", "lockscreen-login-box@HDMI-A-1" ]
+
+    [lockscreen_widgets.grid]
+    cell_size = 16
+    major_interval = 4
+    visible = true
+
+    [lockscreen_widgets.widget."lockscreen-login-box@HDMI-A-1"]
+    box_height = 196.0
+    box_width = 810.0
+    cx = 960.0
+    cy = 898.0
+    output = "HDMI-A-1"
+    placement_height = 1080.0
+    placement_width = 1920.0
+    rotation = 0.0
+    type = "login_box"
+
+        [lockscreen_widgets.widget."lockscreen-login-box@HDMI-A-1".settings]
+        background_color = "surface_container"
+        background_opacity = 0.88
+        background_radius = 12.0
+        center_password_text = false
+        input_opacity = 1.0
+        input_radius = 6.0
+        layout = "regular"
+        show_caps_lock = true
+        show_keyboard_layout = true
+        show_login_button = true
+        show_media = true
+        show_session_buttons = true
+        show_unlock_hint = true
+        show_weather = true
+
+    [lockscreen_widgets.widget."lockscreen-login-box@WL-1"]
+    box_height = 196.0
+    box_width = 810.0
+    cx = 640.0
+    cy = 538.0
+    output = "WL-1"
+    placement_height = 720.0
+    placement_width = 1280.0
+    rotation = 0.0
+    type = "login_box"
+
+        [lockscreen_widgets.widget."lockscreen-login-box@WL-1".settings]
+        background_color = "surface_container"
+        background_opacity = 0.88
+        background_radius = 12.0
+        center_password_text = false
+        input_opacity = 1.0
+        input_radius = 6.0
+        layout = "regular"
+        show_caps_lock = true
+        show_keyboard_layout = true
+        show_login_button = true
+        show_media = true
+        show_session_buttons = true
+        show_unlock_hint = true
+        show_weather = true
+
+[shell]
+font_family = "JetBrainsMonoNL NF"
+
+[theme]
+builtin = "Rosé Pine"
+
+    [theme.templates]
+    builtin_ids = [ "alacritty", "btop", "labwc", "qt" ]
+
+[wallpaper.default]
+path = "/home/cup/Pictures/Wallpapers/ching-yeh.jpg"
+
+[wallpaper.last]
+path = "/home/cup/Pictures/Wallpapers/ching-yeh.jpg"
+
+[wallpaper.monitors.HDMI-A-1]
+path = "/home/cup/Pictures/Wallpapers/ching-yeh.jpg"
